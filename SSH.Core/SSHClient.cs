@@ -1,4 +1,5 @@
 ﻿using Renci.SshNet;
+using Renci.SshNet.Common;
 using SSH.Core.Entities;
 using SSH.Core.Interfaces;
 using System;
@@ -13,10 +14,11 @@ namespace SSH.Core
     public class SSHClient : IDisposable, ISshActions
     {
         private readonly SshClient _client;
-
+        private readonly Credentials _credentials;
         public SSHClient(string hostname, string username, string password)
         {
             _client = new SshClient(hostname, username, password);
+            _credentials = new Credentials() { Hostname = hostname, Login = username, Password = password };
             _client.Connect();
         }
 
@@ -24,6 +26,7 @@ namespace SSH.Core
         {
             _client = new SshClient(credentials.Hostname,
                 credentials.Login, credentials.Password);
+            _credentials = credentials;
             _client.Connect();
         }
 
@@ -68,6 +71,17 @@ namespace SSH.Core
         public SystemInfo GetInfo()
         {
             return new SystemInfo() { Os = _client.RunCommand("uname -v").Result };
+        }
+
+        public bool Reboot()
+        {
+            using (var cmd = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S shutdown -r"))
+            {
+                if (cmd.ExitStatus == 0)
+                    return true;
+                else
+                    return false;
+            }
         }
     }
 }

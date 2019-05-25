@@ -11,5 +11,6 @@ namespace SSH.Core.Interfaces
         IEnumerable<ProcessInfo> GetProcesses();
         SystemInfo GetInfo();
         bool CheckConnection();
+        bool Reboot();
     }
 }
