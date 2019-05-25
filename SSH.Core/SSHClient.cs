@@ -62,6 +62,16 @@ namespace SSH.Core
         {
             var command = _client.RunCommand("TERM=xterm ps -eo cmd,%mem,%cpu,pid --sort=-%mem | head");
             var data = Regex.Split(string.Join("",Regex.Split(command.Result, "PID")[1]), "\n");
+
+
+          /*  foreach(var line in data.Where(elem => elem != ""))
+            {
+                var items = Regex.Split(line, "  ").Where(elem => elem != "").ToList();
+                var cpu = Double.Parse(items[2], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US"));
+                var memory = Double.Parse(items[1], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US"));
+            }*/
+
+
             var result = data.ToList().Select(line => {
                 var items = Regex.Split(line, "  ").Where(elem => elem != "").ToList();
                 if(items.Count != 0)
