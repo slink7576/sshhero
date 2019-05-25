@@ -14,7 +14,7 @@ namespace SSH.Application.Command.Commands.ExecuteCustom
         {
             using (var client = new SSHClient(request.Credentials))
             {
-                var command = client.Execute(request.Command);
+                var command = client.Execute(request.Command, request.IsSudo);
                 return new ExecuteCustomCommandViewModel() { Result =  command.Result,
                     Error = command.Error, IsError = command.Error.Length == 0 ? false : true};
             }

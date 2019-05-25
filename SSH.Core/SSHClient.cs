@@ -31,9 +31,20 @@ namespace SSH.Core
         }
 
 
-        public SshCommand Execute(string command)
+        public SshCommand Execute(string command, bool isSudo)
         {
-            return _client.RunCommand(command);
+            try
+            {
+                if (isSudo)
+                    return _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S " + command);
+                else
+                    return _client.RunCommand(command);
+            }
+          catch(SshConnectionException c)
+            {
+                return _client.CreateCommand(command);
+            }
+         
         }
 
         public void Dispose()

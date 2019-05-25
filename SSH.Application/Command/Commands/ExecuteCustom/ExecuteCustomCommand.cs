@@ -9,5 +9,6 @@ namespace SSH.Application.Command.Commands.ExecuteCustom
     public class ExecuteCustomCommand : BaseCommand, IRequest<ExecuteCustomCommandViewModel>
     {
         public string Command { get; set; }
+        public bool IsSudo { get; set; }
     }
 }
