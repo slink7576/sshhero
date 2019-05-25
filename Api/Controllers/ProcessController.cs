@@ -14,7 +14,7 @@ namespace Api.Controllers
     public class ProcessController : BaseController
     {
         [HttpPost]
-        [ProducesResponseType(typeof(IEnumerable<ProcessesListViewModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProcessesListViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAllProcesses([FromBody] GetAllProcessesCommand command)
         {
             return Ok(await Mediator.Send(command));

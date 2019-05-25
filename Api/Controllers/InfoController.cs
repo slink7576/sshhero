@@ -13,7 +13,7 @@ namespace Api.Controllers
     public class InfoController : BaseController
     {
         [HttpPost]
-        [ProducesResponseType(typeof(IEnumerable<SystemInfoViewModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(SystemInfoViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetSystemInfo([FromBody] GetSystemInfoCommand command)
         {
             return Ok(await Mediator.Send(command));

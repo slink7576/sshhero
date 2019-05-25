@@ -5,9 +5,9 @@ VisualStudioVersion = 15.0.28010.2019
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SSH.Core", "SSH.Core\SSH.Core.csproj", "{141322C2-C15B-40A2-B36C-8656C3DDE128}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "Api\Api.csproj", "{B61E2A9B-6632-48DD-B1ED-5166A27A1888}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Api\Api.csproj", "{B61E2A9B-6632-48DD-B1ED-5166A27A1888}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSH.Application", "SSH.Application\SSH.Application.csproj", "{DFFB205C-7F9A-436A-A33A-47BC5D4C989E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SSH.Application", "SSH.Application\SSH.Application.csproj", "{DFFB205C-7F9A-436A-A33A-47BC5D4C989E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -13,7 +13,7 @@ namespace Api.Controllers
     public class ConnectionController : BaseController
     {
         [HttpPost]
-        [ProducesResponseType(typeof(IEnumerable<CheckConnectionViewModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(CheckConnectionViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> CheckConnection([FromBody] CheckConnectionCommand command)
         {
             return Ok(await Mediator.Send(command));

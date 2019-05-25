@@ -13,7 +13,7 @@ namespace Api.Controllers
     public class CommandController : BaseController
     {
         [HttpPost]
-        [ProducesResponseType(typeof(IEnumerable<ExecuteCustomCommandViewModel>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ExecuteCustomCommandViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ExecuteCustom([FromBody] ExecuteCustomCommand command)
         {
             return Ok(await Mediator.Send(command));

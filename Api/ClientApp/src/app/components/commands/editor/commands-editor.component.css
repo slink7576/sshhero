@@ -1,0 +1,11 @@
+.console{
+background-color: black;
+width: 20em;
+height: 20em;
+color:white;
+padding: 1em;
+}
+.console-bar{
+    position: relative;
+    top: 80%;
+}

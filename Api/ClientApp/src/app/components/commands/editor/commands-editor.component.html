@@ -1,0 +1,18 @@
+
+    <div class="console">
+{{result}}
+<div class="console-bar">
+    <div class="row">
+            <form [formGroup]="commandFormGroup">
+                    <mat-form-field>
+            <input matInput type="text" formControlName="Command"  placeholder="...">
+       </mat-form-field>
+            <button (click)="onSendCommand()">Send</button>
+            </form>
+    </div>
+    
+    
+</div>
+
+    </div>
+   
