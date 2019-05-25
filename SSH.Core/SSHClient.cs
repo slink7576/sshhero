@@ -15,6 +15,7 @@ namespace SSH.Core
     {
         private readonly SshClient _client;
         private readonly Credentials _credentials;
+
         public SSHClient(string hostname, string username, string password)
         {
             _client = new SshClient(hostname, username, password);
@@ -30,7 +31,6 @@ namespace SSH.Core
             _client.Connect();
         }
 
-
         public SshCommand Execute(string command, bool isSudo)
         {
             try
@@ -40,11 +40,10 @@ namespace SSH.Core
                 else
                     return _client.RunCommand(command);
             }
-          catch(SshConnectionException c)
+            catch(SshConnectionException c)
             {
                 return _client.CreateCommand(command);
             }
-         
         }
 
         public void Dispose()
