@@ -1,1 +1,11 @@
-<commands-editor-component></commands-editor-component>
+<mat-sidenav-container class="holder">
+    <mat-sidenav mode="side" opened class="sidenav">
+        <button mat-flat-button color="primary" class="side-button">
+            <mat-icon>input</mat-icon>
+        </button>
+    </mat-sidenav>
+    <mat-sidenav-content class="content">
+            <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>
+

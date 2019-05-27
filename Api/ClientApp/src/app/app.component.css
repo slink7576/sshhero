@@ -1,0 +1,22 @@
+
+@font-face{
+    font-family: "Terminal";
+    src: url("./../fonts/Futura.ttf");
+  }
+.holder{
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+.sidenav{
+    padding: 1em;
+    
+}
+.content{
+    background-color: white
+}
+.side-button{
+    padding: 0.5em
+}

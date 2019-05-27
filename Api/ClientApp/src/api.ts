@@ -76,21 +76,61 @@ export class CommandClient {
         }
         return _observableOf<ExecuteCustomCommandViewModel | null>(<any>null);
     }
-}
 
-@Injectable()
-export class ConnectionClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+    reboot(command: RebootCommand): Observable<boolean> {
+        let url_ = this.baseUrl + "/api/Command/Reboot";
+        url_ = url_.replace(/[?&]$/, "");
 
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44379";
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processReboot(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processReboot(<any>response_);
+                } catch (e) {
+                    return <Observable<boolean>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<boolean>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processReboot(response: HttpResponseBase): Observable<boolean> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<boolean>(<any>null);
     }
 
     checkConnection(command: CheckConnectionCommand): Observable<CheckConnectionViewModel | null> {
-        let url_ = this.baseUrl + "/api/Connection/CheckConnection";
+        let url_ = this.baseUrl + "/api/Command/CheckConnection";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
@@ -140,21 +180,9 @@ export class ConnectionClient {
         }
         return _observableOf<CheckConnectionViewModel | null>(<any>null);
     }
-}
-
-@Injectable()
-export class InfoClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44379";
-    }
 
     getSystemInfo(command: GetSystemInfoCommand): Observable<SystemInfoViewModel | null> {
-        let url_ = this.baseUrl + "/api/Info/GetSystemInfo";
+        let url_ = this.baseUrl + "/api/Command/GetSystemInfo";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
@@ -204,21 +232,9 @@ export class InfoClient {
         }
         return _observableOf<SystemInfoViewModel | null>(<any>null);
     }
-}
-
-@Injectable()
-export class ProcessClient {
-    private http: HttpClient;
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44379";
-    }
 
     getAllProcesses(command: GetAllProcessesCommand): Observable<ProcessesListViewModel | null> {
-        let url_ = this.baseUrl + "/api/Process/GetAllProcesses";
+        let url_ = this.baseUrl + "/api/Command/GetAllProcesses";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(command);
@@ -350,6 +366,7 @@ export interface IBaseCommand {
 
 export class ExecuteCustomCommand extends BaseCommand implements IExecuteCustomCommand {
     command?: string | undefined;
+    isSudo!: boolean;
 
     constructor(data?: IExecuteCustomCommand) {
         super(data);
@@ -359,6 +376,7 @@ export class ExecuteCustomCommand extends BaseCommand implements IExecuteCustomC
         super.init(data);
         if (data) {
             this.command = data["command"];
+            this.isSudo = data["isSudo"];
         }
     }
 
@@ -372,6 +390,7 @@ export class ExecuteCustomCommand extends BaseCommand implements IExecuteCustomC
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["command"] = this.command;
+        data["isSudo"] = this.isSudo;
         super.toJSON(data);
         return data; 
     }
@@ -379,6 +398,7 @@ export class ExecuteCustomCommand extends BaseCommand implements IExecuteCustomC
 
 export interface IExecuteCustomCommand extends IBaseCommand {
     command?: string | undefined;
+    isSudo: boolean;
 }
 
 export class Credentials implements ICredentials {
@@ -423,6 +443,33 @@ export interface ICredentials {
     hostname?: string | undefined;
     password?: string | undefined;
     login?: string | undefined;
+}
+
+export class RebootCommand extends BaseCommand implements IRebootCommand {
+
+    constructor(data?: IRebootCommand) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+    }
+
+    static fromJS(data: any): RebootCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new RebootCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IRebootCommand extends IBaseCommand {
 }
 
 export class CheckConnectionViewModel implements ICheckConnectionViewModel {

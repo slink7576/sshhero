@@ -1,11 +1,8 @@
 .console{
-background-color: black;
-width: 20em;
-height: 20em;
-color:white;
+background-color: whitesmoke;
+width: 100%;
+color:black;
 padding: 1em;
-}
-.console-bar{
-    position: relative;
-    top: 80%;
+font-family: 'Terminal';
+font-size: 200%;
 }

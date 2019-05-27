@@ -7,7 +7,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CommandsEditorComponent } from './components/commands/editor/commands-editor.component';
 import { CommandClient } from 'src/api';
 import {  HttpClientModule } from '@angular/common/http';
-
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -19,7 +19,14 @@ import {  HttpClientModule } from '@angular/common/http';
     BrowserAnimationsModule,
     BrowserModule,
     CustomMaterialModule,
-    HttpClientModule
+    HttpClientModule,
+    RouterModule.forRoot(
+      [
+        { path: '', component: CommandsEditorComponent},
+        { path: 'console', component: CommandsEditorComponent},
+      //  { path: '**', component: PageNotFoundComponent }
+      ]
+    )
   ],
   providers: [CommandClient,],
   bootstrap: [AppComponent]

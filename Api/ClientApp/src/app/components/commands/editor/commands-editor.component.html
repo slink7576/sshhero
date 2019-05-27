@@ -1,18 +1,15 @@
-
-    <div class="console">
-{{result}}
-<div class="console-bar">
-    <div class="row">
-            <form [formGroup]="commandFormGroup">
-                    <mat-form-field>
-            <input matInput type="text" formControlName="Command"  placeholder="...">
-       </mat-form-field>
-            <button (click)="onSendCommand()">Send</button>
-            </form>
-    </div>
-    
-    
+<div class="console"  style="white-space: pre-line; overflow-y: scroll; height:85vh;">
+        <p>{{result}}</p>
+        <p class="text-danger">&nbsp;{{error}}</p>
 </div>
-
-    </div>
-   
+<div class="col-12 p-4 bg-white">
+        <form [formGroup]="commandFormGroup" autocomplete="off">
+            <mat-form-field class="mr-3">
+                <input matInput type="text" formControlName="Command" (keyup.arrowup)="onLoadCommandUp()"
+                (keyup.arrowdown)="onLoadCommandDown()"
+                 (keyup.enter)="onSendCommand()">
+            </mat-form-field>
+           
+            <button mat-flat-button color="secondary" (click)="onClear()">Clear</button>
+        </form>
+</div>

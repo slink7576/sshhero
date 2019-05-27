@@ -1,0 +1,17 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+/dist
+/tmp
+/out-tsc
+
+# dependencies
+/node_modules
+
+/api/bin
+/api/obj
+/api/Properties
+/SSH.Application/bin
+/SSH.Application/obj
+/SSH.Core/bin
+/SSH.Core/obj

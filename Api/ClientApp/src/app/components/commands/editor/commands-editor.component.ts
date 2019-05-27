@@ -10,16 +10,42 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 export class CommandsEditorComponent {
 constructor(private _formBuilder: FormBuilder, private client: CommandClient){}
-result:string = 'Your commands here';
+result:string = 'Hello world!';
+error:string;
+index = 0;
+commandsHistory = new Array();
 commandFormGroup: FormGroup;
   ngOnInit() {
     this.commandFormGroup = this._formBuilder.group({
-      Command: ['', Validators.required]
+      Command: ['', ]
     });
   }
+  onClear(){
+    this.result = '';
+    this.error = '';
+  }
+  onLoadCommandUp(){
+    this.index--;
+    if(this.index < 0){
+      this.index = 0;
+    }
+    this.commandFormGroup.controls['Command'].setValue(this.commandsHistory[this.index]);
+  }
+  onLoadCommandDown(){
+    this.index++;
+    if(this.index >= this.commandsHistory.length){
+      this.index = this.commandsHistory.length - 1;
+    }
+    this.commandFormGroup.controls['Command'].setValue(this.commandsHistory[this.index]);
+  }
+
   onSendCommand(){
+    this.commandsHistory.push(this.commandFormGroup.controls['Command'].value);
+    this.index = this.commandsHistory.length;
+    console.log(this.commandsHistory);
     let command = new ExecuteCustomCommand();
     command.command = this.commandFormGroup.controls['Command'].value;
+    this.commandFormGroup.controls['Command'].setValue('');
     let credentials = new Credentials()
     credentials.hostname = '192.168.1.33';
     credentials.password = 'slinkonline2';
@@ -27,9 +53,15 @@ commandFormGroup: FormGroup;
     command.credentials = credentials;
 
     this.client.executeCustom(command).subscribe(data =>{
-      console.log(data);
-      this.result = data.result;
+      if(data.isError){
+        this.result = '';
+        this.error = data.error;
+      }else{
+        this.result = data.result;
+        this.error = ''
+      }
     });
+    
   }
 }
 
