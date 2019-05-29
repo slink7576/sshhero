@@ -12,9 +12,16 @@ namespace SSH.Application.Command.Commands.Reboot
     {
         public async Task<bool> Handle(RebootCommand request, CancellationToken cancellationToken)
         {
-            using (var client = new SSHClient(request.Credentials))
+            try
             {
-                return client.Reboot();
+                using (var client = new SSHClient(request.Credentials))
+                {
+                    return client.Reboot();
+                }
+            }
+            catch(Exception c)
+            {
+                return false;
             }
         }
     }
