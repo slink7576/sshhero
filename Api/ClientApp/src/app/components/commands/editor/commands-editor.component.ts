@@ -10,15 +10,30 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 export class CommandsEditorComponent {
 constructor(private _formBuilder: FormBuilder, private client: CommandClient){}
+
 result:string = 'Hello world!';
 error:string;
 index = 0;
-commandsHistory = new Array();
+
+commandsHistory = new Array<string>();
 commandFormGroup: FormGroup;
+
+servers = new Array<Credentials>();
+serversFormGroup: FormGroup;
+
   ngOnInit() {
     this.commandFormGroup = this._formBuilder.group({
       Command: ['', ]
     });
+    this.serversFormGroup = this._formBuilder.group({
+      Server: ['', ]
+    });
+    let slink = new Credentials();
+    slink.hostname = '192.168.1.33';
+    slink.password = 'slinkonline2';
+    slink.login = 'slink7576';
+    this.serversFormGroup.controls['Server'].setValue(slink);
+    this.servers.push(slink);
   }
   onClear(){
     this.result = '';

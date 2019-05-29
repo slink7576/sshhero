@@ -6,3 +6,9 @@ padding: 1em;
 font-family: 'Terminal';
 font-size: 200%;
 }
+.servers{
+    position: absolute;
+    font-size: 50%;
+    right: 3%;
+    top: 3%;
+}
