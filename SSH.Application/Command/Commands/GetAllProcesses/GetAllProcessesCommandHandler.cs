@@ -12,9 +12,16 @@ namespace SSH.Application.Processes.Query.GetAllProcesses
     {
         public async Task<ProcessesListViewModel> Handle(GetAllProcessesCommand request, CancellationToken cancellationToken)
         {
-            using(var client = new SSHClient(request.Credentials))
+            try
             {
-                return new ProcessesListViewModel() { Processes = client.GetProcesses() };
+                using (var client = new SSHClient(request.Credentials))
+                {
+                    return new ProcessesListViewModel() { Processes = client.GetProcesses() };
+                }
+            }
+            catch(Exception c)
+            {
+                return new ProcessesListViewModel() { Error = c.Message, IsError = true, Processes = null };
             }
         }
     }

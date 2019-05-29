@@ -99,23 +99,66 @@ var CommandClient = /** @class */ (function () {
         }
         return _observableOf(null);
     };
-    CommandClient = __decorate([
-        Injectable(),
-        __param(0, Inject(HttpClient)), __param(1, Optional()), __param(1, Inject(API_BASE_URL)),
-        __metadata("design:paramtypes", [HttpClient, String])
-    ], CommandClient);
-    return CommandClient;
-}());
-export { CommandClient };
-var ConnectionClient = /** @class */ (function () {
-    function ConnectionClient(http, baseUrl) {
-        this.jsonParseReviver = undefined;
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44379";
-    }
-    ConnectionClient.prototype.checkConnection = function (command) {
+    CommandClient.prototype.reboot = function (command) {
         var _this = this;
-        var url_ = this.baseUrl + "/api/Connection/CheckConnection";
+        var url_ = this.baseUrl + "/api/Command/Reboot";
+        url_ = url_.replace(/[?&]$/, "");
+        var content_ = JSON.stringify(command);
+        var options_ = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap(function (response_) {
+            return _this.processReboot(response_);
+        })).pipe(_observableCatch(function (response_) {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return _this.processReboot(response_);
+                }
+                catch (e) {
+                    return _observableThrow(e);
+                }
+            }
+            else
+                return _observableThrow(response_);
+        }));
+    };
+    CommandClient.prototype.processReboot = function (response) {
+        var _this = this;
+        var status = response.status;
+        var responseBlob = response instanceof HttpResponse ? response.body :
+            response.error instanceof Blob ? response.error : undefined;
+        var _headers = {};
+        if (response.headers) {
+            for (var _i = 0, _a = response.headers.keys(); _i < _a.length; _i++) {
+                var key = _a[_i];
+                _headers[key] = response.headers.get(key);
+            }
+        }
+        ;
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(function (_responseText) {
+                var result200 = null;
+                var resultData200 = _responseText === "" ? null : JSON.parse(_responseText, _this.jsonParseReviver);
+                result200 = resultData200 !== undefined ? resultData200 : null;
+                return _observableOf(result200);
+            }));
+        }
+        else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(function (_responseText) {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null);
+    };
+    CommandClient.prototype.checkConnection = function (command) {
+        var _this = this;
+        var url_ = this.baseUrl + "/api/Command/CheckConnection";
         url_ = url_.replace(/[?&]$/, "");
         var content_ = JSON.stringify(command);
         var options_ = {
@@ -142,7 +185,7 @@ var ConnectionClient = /** @class */ (function () {
                 return _observableThrow(response_);
         }));
     };
-    ConnectionClient.prototype.processCheckConnection = function (response) {
+    CommandClient.prototype.processCheckConnection = function (response) {
         var _this = this;
         var status = response.status;
         var responseBlob = response instanceof HttpResponse ? response.body :
@@ -170,23 +213,9 @@ var ConnectionClient = /** @class */ (function () {
         }
         return _observableOf(null);
     };
-    ConnectionClient = __decorate([
-        Injectable(),
-        __param(0, Inject(HttpClient)), __param(1, Optional()), __param(1, Inject(API_BASE_URL)),
-        __metadata("design:paramtypes", [HttpClient, String])
-    ], ConnectionClient);
-    return ConnectionClient;
-}());
-export { ConnectionClient };
-var InfoClient = /** @class */ (function () {
-    function InfoClient(http, baseUrl) {
-        this.jsonParseReviver = undefined;
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44379";
-    }
-    InfoClient.prototype.getSystemInfo = function (command) {
+    CommandClient.prototype.getSystemInfo = function (command) {
         var _this = this;
-        var url_ = this.baseUrl + "/api/Info/GetSystemInfo";
+        var url_ = this.baseUrl + "/api/Command/GetSystemInfo";
         url_ = url_.replace(/[?&]$/, "");
         var content_ = JSON.stringify(command);
         var options_ = {
@@ -213,7 +242,7 @@ var InfoClient = /** @class */ (function () {
                 return _observableThrow(response_);
         }));
     };
-    InfoClient.prototype.processGetSystemInfo = function (response) {
+    CommandClient.prototype.processGetSystemInfo = function (response) {
         var _this = this;
         var status = response.status;
         var responseBlob = response instanceof HttpResponse ? response.body :
@@ -241,23 +270,9 @@ var InfoClient = /** @class */ (function () {
         }
         return _observableOf(null);
     };
-    InfoClient = __decorate([
-        Injectable(),
-        __param(0, Inject(HttpClient)), __param(1, Optional()), __param(1, Inject(API_BASE_URL)),
-        __metadata("design:paramtypes", [HttpClient, String])
-    ], InfoClient);
-    return InfoClient;
-}());
-export { InfoClient };
-var ProcessClient = /** @class */ (function () {
-    function ProcessClient(http, baseUrl) {
-        this.jsonParseReviver = undefined;
-        this.http = http;
-        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44379";
-    }
-    ProcessClient.prototype.getAllProcesses = function (command) {
+    CommandClient.prototype.getAllProcesses = function (command) {
         var _this = this;
-        var url_ = this.baseUrl + "/api/Process/GetAllProcesses";
+        var url_ = this.baseUrl + "/api/Command/GetAllProcesses";
         url_ = url_.replace(/[?&]$/, "");
         var content_ = JSON.stringify(command);
         var options_ = {
@@ -284,7 +299,7 @@ var ProcessClient = /** @class */ (function () {
                 return _observableThrow(response_);
         }));
     };
-    ProcessClient.prototype.processGetAllProcesses = function (response) {
+    CommandClient.prototype.processGetAllProcesses = function (response) {
         var _this = this;
         var status = response.status;
         var responseBlob = response instanceof HttpResponse ? response.body :
@@ -312,14 +327,14 @@ var ProcessClient = /** @class */ (function () {
         }
         return _observableOf(null);
     };
-    ProcessClient = __decorate([
+    CommandClient = __decorate([
         Injectable(),
         __param(0, Inject(HttpClient)), __param(1, Optional()), __param(1, Inject(API_BASE_URL)),
         __metadata("design:paramtypes", [HttpClient, String])
-    ], ProcessClient);
-    return ProcessClient;
+    ], CommandClient);
+    return CommandClient;
 }());
-export { ProcessClient };
+export { CommandClient };
 var ExecuteCustomCommandViewModel = /** @class */ (function () {
     function ExecuteCustomCommandViewModel(data) {
         if (data) {
@@ -387,6 +402,7 @@ var ExecuteCustomCommand = /** @class */ (function (_super) {
         _super.prototype.init.call(this, data);
         if (data) {
             this.command = data["command"];
+            this.isSudo = data["isSudo"];
         }
     };
     ExecuteCustomCommand.fromJS = function (data) {
@@ -398,6 +414,7 @@ var ExecuteCustomCommand = /** @class */ (function (_super) {
     ExecuteCustomCommand.prototype.toJSON = function (data) {
         data = typeof data === 'object' ? data : {};
         data["command"] = this.command;
+        data["isSudo"] = this.isSudo;
         _super.prototype.toJSON.call(this, data);
         return data;
     };
@@ -436,6 +453,28 @@ var Credentials = /** @class */ (function () {
     return Credentials;
 }());
 export { Credentials };
+var RebootCommand = /** @class */ (function (_super) {
+    __extends(RebootCommand, _super);
+    function RebootCommand(data) {
+        return _super.call(this, data) || this;
+    }
+    RebootCommand.prototype.init = function (data) {
+        _super.prototype.init.call(this, data);
+    };
+    RebootCommand.fromJS = function (data) {
+        data = typeof data === 'object' ? data : {};
+        var result = new RebootCommand();
+        result.init(data);
+        return result;
+    };
+    RebootCommand.prototype.toJSON = function (data) {
+        data = typeof data === 'object' ? data : {};
+        _super.prototype.toJSON.call(this, data);
+        return data;
+    };
+    return RebootCommand;
+}(BaseCommand));
+export { RebootCommand };
 var CheckConnectionViewModel = /** @class */ (function () {
     function CheckConnectionViewModel(data) {
         if (data) {

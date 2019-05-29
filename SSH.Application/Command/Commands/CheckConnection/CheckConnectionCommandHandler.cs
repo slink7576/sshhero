@@ -12,9 +12,16 @@ namespace SSH.Application.Connection.Command.CheckConnection
     {
         public async Task<CheckConnectionViewModel> Handle(CheckConnectionCommand request, CancellationToken cancellationToken)
         {
-            using (var client = new SSHClient(request.Credentials))
+            try
             {
-                return new CheckConnectionViewModel() { IsAlive = client.CheckConnection() };
+                using (var client = new SSHClient(request.Credentials))
+                {
+                    return new CheckConnectionViewModel() { IsAlive = client.CheckConnection() };
+                }
+            }
+            catch (Exception c)
+            {
+                return new CheckConnectionViewModel() { IsError = true, Error = c.Message, IsAlive = false };
             }
         }
     }

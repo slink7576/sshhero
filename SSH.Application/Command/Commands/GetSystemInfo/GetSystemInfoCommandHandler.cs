@@ -12,10 +12,18 @@ namespace SSH.Application.System.Commands.GetSystemInfo
     {
         public async Task<SystemInfoViewModel> Handle(GetSystemInfoCommand request, CancellationToken cancellationToken)
         {
-            using (var client = new SSHClient(request.Credentials))
+            try
             {
-                return new SystemInfoViewModel() { OS = client.GetInfo().Os };
+                using (var client = new SSHClient(request.Credentials))
+                {
+                    return new SystemInfoViewModel() { OS = client.GetInfo().Os };
+                }
             }
+            catch(Exception c)
+            {
+                return new SystemInfoViewModel() { Error = c.Message, IsError = true, OS = null };
+            }
+            
         }
     }
 }

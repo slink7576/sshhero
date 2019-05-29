@@ -12,12 +12,25 @@ namespace SSH.Application.Command.Commands.ExecuteCustom
     {
         public async Task<ExecuteCustomCommandViewModel> Handle(ExecuteCustomCommand request, CancellationToken cancellationToken)
         {
-            using (var client = new SSHClient(request.Credentials))
+            try
             {
-                var command = client.Execute(request.Command, request.IsSudo);
-                return new ExecuteCustomCommandViewModel() { Result =  command.Result,
-                    Error = command.Error, IsError = command.Error.Length == 0 ? false : true};
+                using (var client = new SSHClient(request.Credentials))
+                {
+                    var command = client.Execute(request.Command, request.IsSudo);
+                    return new ExecuteCustomCommandViewModel()
+                    {
+                        Result = command.Result,
+                        Error = command.Error,
+                        IsError = command.Error.Length == 0 ? false : true
+                    };
+                }
+            }
+            catch (Exception c)
+            {
+                return new ExecuteCustomCommandViewModel() { Error = c.Message, IsError = true };
+
             }
         }
     }
 }
+
