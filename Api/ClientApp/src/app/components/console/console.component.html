@@ -1,6 +1,9 @@
 <div class="console" style="white-space: pre-line; overflow-y: scroll; height:85vh;">
         <mat-card class="servers pl-3 pr-3">
-                <form [formGroup]="serversFormGroup" autocomplete="off">
+                        <p *ngIf="this.servers.length == 0">
+                                        Add a remote machine in settings
+                                      </p>
+                <form *ngIf="this.servers.length != 0" [formGroup]="serversFormGroup" autocomplete="off">
                         <mat-form-field style="min-width: 40vh;">
                                 <mat-label>Current machine</mat-label>
                                 <mat-select matInput formControlName="Server">

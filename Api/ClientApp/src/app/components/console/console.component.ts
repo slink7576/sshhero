@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ExecuteCustomCommand, CommandClient, Credentials } from 'src/api';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { ServersService } from 'src/app/services/servers.service';
 
 @Component({
   selector: 'console-component',
@@ -9,7 +10,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 })
 
 export class ConsoleComponent {
-constructor(private formBuilder: FormBuilder, private client: CommandClient){}
+constructor(private formBuilder: FormBuilder, private serversService: ServersService,
+   private client: CommandClient){}
 
 result:string = 'Hello world!';
 error:string;
@@ -28,12 +30,10 @@ serversFormGroup: FormGroup;
     this.serversFormGroup = this.formBuilder.group({
       Server: ['', ]
     });
-    let slink = new Credentials();
-    slink.hostname = '192.168.1.33';
-    slink.password = 'slinkonline2';
-    slink.login = 'slink7576';
-    this.serversFormGroup.controls['Server'].setValue(slink);
-    this.servers.push(slink);
+    this.servers = this.serversService.getServers();
+    if(this.servers.length != 0){
+      this.serversFormGroup.controls['Server'].setValue(this.servers[0]);
+    }
   }
   onClear(){
     this.result = '';
@@ -57,15 +57,12 @@ serversFormGroup: FormGroup;
   onSendCommand(){
     this.commandsHistory.push(this.commandFormGroup.controls['Command'].value);
     this.index = this.commandsHistory.length;
-    console.log(this.commandsHistory);
+
     let command = new ExecuteCustomCommand();
     command.command = this.commandFormGroup.controls['Command'].value;
     this.commandFormGroup.controls['Command'].setValue('');
-    let credentials = new Credentials()
-    credentials.hostname = '192.168.1.33';
-    credentials.password = 'slinkonline2';
-    credentials.login = 'slink7576';
-    command.credentials = credentials;
+   
+    command.credentials = this.serversFormGroup.controls['Server'].value;
 
     this.client.executeCustom(command).subscribe(data =>{
       if(data.isError){
