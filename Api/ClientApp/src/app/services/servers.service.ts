@@ -4,7 +4,7 @@ import { Credentials } from "src/api";
 @Injectable()
 export class ServersService {
     getServers() {
-        return localStorage.getItem('servers');
+        return JSON.parse(localStorage.getItem('servers'));
     }
     addServer(server: Credentials) {
         let serv = JSON.parse(localStorage.getItem('servers'));
@@ -18,10 +18,11 @@ export class ServersService {
     deleteServer(server: Credentials) {
         let serv = JSON.parse(localStorage.getItem('servers'));
         if (serv) {
-            const index = serv.indexOf(server, 0);
-            if (index > -1) {
-                serv.splice(index, 1);
-            }
+            serv.forEach(element => {
+                if(element.hostname == server.hostname){
+                    serv.splice(serv.indexOf(element), 1);
+                }
+            });
             localStorage.setItem('servers', JSON.stringify(serv));
         }
 

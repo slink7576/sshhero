@@ -3,13 +3,13 @@ import { ExecuteCustomCommand, CommandClient, Credentials } from 'src/api';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'commands-editor-component',
-  templateUrl: './commands-editor.component.html',
-  styleUrls: ['./commands-editor.component.css']
+  selector: 'console-component',
+  templateUrl: './console.component.html',
+  styleUrls: ['./console.component.css']
 })
 
-export class CommandsEditorComponent {
-constructor(private _formBuilder: FormBuilder, private client: CommandClient){}
+export class ConsoleComponent {
+constructor(private formBuilder: FormBuilder, private client: CommandClient){}
 
 result:string = 'Hello world!';
 error:string;
@@ -22,10 +22,10 @@ servers = new Array<Credentials>();
 serversFormGroup: FormGroup;
 
   ngOnInit() {
-    this.commandFormGroup = this._formBuilder.group({
+    this.commandFormGroup = this.formBuilder.group({
       Command: ['', ]
     });
-    this.serversFormGroup = this._formBuilder.group({
+    this.serversFormGroup = this.formBuilder.group({
       Server: ['', ]
     });
     let slink = new Credentials();
