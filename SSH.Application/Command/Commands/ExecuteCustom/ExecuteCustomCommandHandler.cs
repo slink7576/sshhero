@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Caching.Memory;
 using SSH.Core;
 using System;
 using System.Collections.Generic;
@@ -11,16 +12,26 @@ namespace SSH.Application.Command.Commands.ExecuteCustom
 {
     public class ExecuteCustomCommandHandler : IRequestHandler<ExecuteCustomCommand, ExecuteCustomCommandViewModel>
     {
+        private IMemoryCache _cache;
+        public ExecuteCustomCommandHandler(IMemoryCache memoryCache)
+        {
+            _cache = memoryCache;
+        }
+
         public async Task<ExecuteCustomCommandViewModel> Handle(ExecuteCustomCommand request, CancellationToken cancellationToken)
         {
-            try
+            bool alive = false;
+            if (!_cache.TryGetValue(request.Credentials.Hostname, out alive))
             {
                 var ping = new Ping();
                 PingReply pingresult = ping.Send(request.Credentials.Hostname);
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                      .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 if (pingresult.Status.ToString() == "Success")
                 {
                     using (var client = new SSHClient(request.Credentials))
                     {
+                        _cache.Set(request.Credentials.Hostname, true, cacheEntryOptions);
                         var command = client.Execute(request.Command, request.IsSudo);
                         return new ExecuteCustomCommandViewModel()
                         {
@@ -32,15 +43,15 @@ namespace SSH.Application.Command.Commands.ExecuteCustom
                 }
                 else
                 {
-                    return new ExecuteCustomCommandViewModel() { IsError = true};
+                    _cache.Set(request.Credentials.Hostname, false, cacheEntryOptions);
+                    return new ExecuteCustomCommandViewModel() { IsError = true, Error = "Couldnt connect to server" };
                 }
-               
             }
-            catch (Exception c)
+            return new ExecuteCustomCommandViewModel()
             {
-                return new ExecuteCustomCommandViewModel() { Error = c.Message, IsError = true };
-
-            }
+                IsError = !alive,
+                Error = alive ? "" : "Couldnt connect to server"
+            };
         }
     }
 }
