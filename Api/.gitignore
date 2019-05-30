@@ -16,3 +16,4 @@
 /SSH.Core/bin
 /SSH.Core/obj
 /ClientApp/dist
+/ClientApp/e2e
