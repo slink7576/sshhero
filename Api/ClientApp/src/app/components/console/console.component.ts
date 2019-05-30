@@ -62,7 +62,8 @@ serversFormGroup: FormGroup;
     command.command = this.commandFormGroup.controls['Command'].value;
     this.commandFormGroup.controls['Command'].setValue('');
    
-    command.credentials = this.serversFormGroup.controls['Server'].value;
+    let cred = new Credentials(this.serversFormGroup.controls['Server'].value)
+    command.credentials = cred;
 
     this.client.executeCustom(command).subscribe(data =>{
       if(data.isError){
