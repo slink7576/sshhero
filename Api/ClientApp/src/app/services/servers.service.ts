@@ -25,6 +25,5 @@ export class ServersService {
             });
             localStorage.setItem('servers', JSON.stringify(serv));
         }
-
     }
 }

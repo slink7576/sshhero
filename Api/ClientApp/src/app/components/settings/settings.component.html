@@ -1,40 +1,52 @@
 <div class="p-5">
     <div class="row">
-<div class="col-6">
-        <h1>Servers List</h1>
-        <div *ngFor='let server of servers'>
-        {{ server.hostname + '@' + server.login }}
-        <button mat-flat-button color="primary" (click)="onDeleteServer(server)">
-                <mat-icon>
-                    delete
-                </mat-icon>
-            </button>
+        <div class="col-6">
+            <h1>Servers List</h1>
+            <mat-card *ngFor='let server of servers; let idx = index' class="mt-4">
+                <div class="row">
+                    <div class="col-8">
+                        {{ server.credentials.hostname + '@' + server.credentials.login }}
+                    </div>
+                    <div class="col-2">
+                        <mat-icon class="pt-2" [style.color]="server.isAlive ? 'green' : 'red'">
+                            {{ statuses[idx] ? '
+                                signal_cellular_4_bar' : '
+                                        signal_cellular_connected_no_internet_4_bar' }}
+                        </mat-icon>
+                    </div>
+                    <div class="col-2">
+                        <button mat-button color="primary" (click)="onDeleteServer(server, idx)">
+                            <mat-icon>
+                                delete
+                            </mat-icon>
+                        </button>
+                    </div>
+                </div>
+            </mat-card>
         </div>
-</div>
-<div class="col-6">
-        <form [formGroup]="serverFormGroup" autocomplete="off">
-            <div>
-                <mat-form-field>
+        <div class="col-6">
+            <form [formGroup]="serverFormGroup" autocomplete="off">
+                <div>
+                    <mat-form-field>
                         <input matInput type="text" formControlName="hostName" placeholder="Hostname">
-                </mat-form-field>
-            </div>
-            <div>
-                <mat-form-field>
+                    </mat-form-field>
+                </div>
+                <div>
+                    <mat-form-field>
                         <input matInput type="text" formControlName="login" placeholder="Login">
-                </mat-form-field>
-            </div>
-            <div>
-                <mat-form-field>
+                    </mat-form-field>
+                </div>
+                <div>
+                    <mat-form-field>
                         <input matInput type="password" formControlName="password" placeholder="Password">
-                </mat-form-field>
-            </div>
+                    </mat-form-field>
+                </div>
                 <button mat-flat-button color="primary" (click)="onSubmitServer()">
                     <mat-icon>
                         add
                     </mat-icon>
                 </button>
-        </form>
-</div>
+            </form>
+        </div>
     </div>
-
 </div>
