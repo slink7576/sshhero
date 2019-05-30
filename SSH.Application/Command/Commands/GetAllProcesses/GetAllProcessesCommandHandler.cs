@@ -2,6 +2,7 @@
 using SSH.Core;
 using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,10 +15,20 @@ namespace SSH.Application.Processes.Query.GetAllProcesses
         {
             try
             {
-                using (var client = new SSHClient(request.Credentials))
+                var ping = new Ping();
+                PingReply pingresult = ping.Send(request.Credentials.Hostname);
+                if (pingresult.Status.ToString() == "Success")
                 {
-                    return new ProcessesListViewModel() { Processes = client.GetProcesses() };
+                    using (var client = new SSHClient(request.Credentials))
+                    {
+                        return new ProcessesListViewModel() { Processes = client.GetProcesses() };
+                    }
                 }
+                else
+                {
+                    return new ProcessesListViewModel() { IsError = true, Processes = null };
+                }
+               
             }
             catch(Exception c)
             {

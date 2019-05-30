@@ -2,6 +2,7 @@
 using SSH.Core;
 using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,9 +15,15 @@ namespace SSH.Application.Connection.Command.CheckConnection
         {
             try
             {
-                using (var client = new SSHClient(request.Credentials))
+                var ping = new Ping();
+                PingReply pingresult = ping.Send(request.Credentials.Hostname);
+                if (pingresult.Status.ToString() == "Success")
                 {
-                    return new CheckConnectionViewModel() { IsAlive = client.CheckConnection() };
+                    return new CheckConnectionViewModel() { IsAlive = true };
+                }
+                else
+                {
+                    return new CheckConnectionViewModel() { IsError = true, IsAlive = false };
                 }
             }
             catch (Exception c)

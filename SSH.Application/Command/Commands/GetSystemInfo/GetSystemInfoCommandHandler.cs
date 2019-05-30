@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net.NetworkInformation;
 
 namespace SSH.Application.System.Commands.GetSystemInfo
 {
@@ -14,10 +15,20 @@ namespace SSH.Application.System.Commands.GetSystemInfo
         {
             try
             {
-                using (var client = new SSHClient(request.Credentials))
+                var ping = new Ping();
+                PingReply pingresult = ping.Send(request.Credentials.Hostname);
+                if (pingresult.Status.ToString() == "Success")
                 {
-                    return new SystemInfoViewModel() { OS = client.GetInfo().Os };
+                    using (var client = new SSHClient(request.Credentials))
+                    {
+                        return new SystemInfoViewModel() { OS = client.GetInfo().Os };
+                    }
                 }
+                else
+                {
+                    return new SystemInfoViewModel() { IsError = true, OS = null };
+                }
+               
             }
             catch(Exception c)
             {
