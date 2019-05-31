@@ -1,28 +1,38 @@
 <div class="console" style="white-space: pre-line; overflow-y: scroll; height:85vh;">
-        <mat-card class="servers pl-3 pr-3">
-                        <p *ngIf="this.servers.length == 0">
-                                        Add a remote machine in settings
-                                      </p>
-                <form *ngIf="this.servers.length != 0" [formGroup]="serversFormGroup" autocomplete="off">
-                        <mat-form-field style="min-width: 40vh;">
-                                <mat-label>Current machine</mat-label>
-                                <mat-select matInput formControlName="Server">
-                                        <mat-option *ngFor="let server of servers" [value]="server">
-                                                {{server.hostname + '@' + server.login}}
-                                        </mat-option>
-                                </mat-select>
-                        </mat-form-field>
-                </form>
-        </mat-card>
         <p>{{result}}</p>
         <p class="text-danger">&nbsp;{{error}}</p>
 </div>
 <div class="col-12 p-1 pl-5 pt-2 bg-white">
-        <form [formGroup]="commandFormGroup" autocomplete="off">
-                <mat-form-field style="min-width:100vh" class="mr-3">
-                        <input matInput type="text" formControlName="Command" (keyup.arrowup)="onLoadCommandUp()"
-                                (keyup.arrowdown)="onLoadCommandDown()" (keyup.enter)="onSendCommand()">
-                </mat-form-field>
-                <button mat-flat-button color="secondary" (click)="onClear()">Clear</button>
-        </form>
+        <div class="row p-0 pt-2 m-0">
+                <div class="col-xl-6 col-12">
+                        <form [formGroup]="commandFormGroup" autocomplete="off">
+                                <mat-form-field class="mr-3" style="min-width:60%">
+                                        <input matInput type="text" formControlName="Command"
+                                                (keyup.arrowup)="onLoadCommandUp()"
+                                                (keyup.arrowdown)="onLoadCommandDown()" (keyup.enter)="onSendCommand()">
+                                </mat-form-field>
+                                <button mat-flat-button color="secondary" (click)="onClear()">
+                                        <mat-icon>clear</mat-icon>
+                                </button>
+                        </form>
+                </div>
+                <div class="col-xl-6 col-12 text-center">
+                        <div class="">
+                                <p *ngIf="this.servers.length == 0">
+                                        Add a remote machine in settings
+                                </p>
+                                <form *ngIf="this.servers.length != 0" [formGroup]="serversFormGroup"
+                                        autocomplete="off">
+                                        <mat-form-field style="min-width:60%">
+                                                <mat-label>Current machine</mat-label>
+                                                <mat-select matInput formControlName="Server">
+                                                        <mat-option *ngFor="let server of servers" [value]="server">
+                                                                {{server.hostname + '@' + server.login}}
+                                                        </mat-option>
+                                                </mat-select>
+                                        </mat-form-field>
+                                </form>
+                        </div>
+                </div>
+        </div>
 </div>

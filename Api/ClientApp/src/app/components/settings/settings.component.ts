@@ -42,6 +42,7 @@ export class SettingsComponent implements OnInit {
       serv.hostname = this.serverFormGroup.controls['hostName'].value;
       serv.login = this.serverFormGroup.controls['login'].value;
       serv.password = this.serverFormGroup.controls['password'].value;
+      this.serverFormGroup.reset();
       this.serversService.addServer(serv);
       let comm = new CheckConnectionCommand();
       comm.credentials = serv;

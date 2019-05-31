@@ -1,0 +1,4 @@
+.settings-cropped-text{
+    text-overflow: ellipsis;
+    overflow: hidden;
+}

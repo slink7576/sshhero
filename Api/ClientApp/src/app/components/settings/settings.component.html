@@ -1,21 +1,21 @@
 <div class="p-5">
     <div class="row">
-        <div class="col-6">
+        <div class="col-12 col-xl-6">
             <h1>Servers List</h1>
             <mat-card *ngFor='let server of servers; let idx = index' class="mt-4">
                 <div class="row">
-                    <div class="col-8">
+                    <div class="col-12 col-xl-8 pt-2 settings-cropped-text">
                         {{ server.credentials.hostname + '@' + server.credentials.login }}
                     </div>
-                    <div class="col-2">
-                        <mat-icon class="pt-2" [style.color]="server.isAlive ? 'green' : 'red'">
-                            {{ statuses[idx] ? '
-                                signal_cellular_4_bar' : '
-                                        signal_cellular_connected_no_internet_4_bar' }}
-                        </mat-icon>
-                    </div>
-                    <div class="col-2">
-                        <button mat-button color="primary" (click)="onDeleteServer(server, idx)">
+                    <div class="col-12 col-xl-4 text-center">
+                        <button mat-icon-button class="mr-2">
+                            <mat-icon [style.color]="server.isAlive ? 'green' : 'red'">
+                                {{ server.isAlive ? '
+                                            signal_cellular_4_bar' : '
+                                                    signal_cellular_connected_no_internet_4_bar' }}
+                            </mat-icon>
+                        </button>
+                        <button mat-icon-button color="primary" (click)="onDeleteServer(server, idx)">
                             <mat-icon>
                                 delete
                             </mat-icon>
@@ -24,7 +24,8 @@
                 </div>
             </mat-card>
         </div>
-        <div class="col-6">
+        <div class="col-2 col-xl-2"></div>
+        <div class="col-12 col-xl-4 pt-5 text-center">
             <form [formGroup]="serverFormGroup" autocomplete="off">
                 <div>
                     <mat-form-field>
@@ -41,11 +42,13 @@
                         <input matInput type="password" formControlName="password" placeholder="Password">
                     </mat-form-field>
                 </div>
-                <button mat-flat-button color="primary" (click)="onSubmitServer()">
-                    <mat-icon>
-                        add
-                    </mat-icon>
-                </button>
+                <div>
+                    <button mat-flat-button color="primary" (click)="onSubmitServer()">
+                        <mat-icon>
+                            add
+                        </mat-icon>
+                    </button>
+                </div>
             </form>
         </div>
     </div>
