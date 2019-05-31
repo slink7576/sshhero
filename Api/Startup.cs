@@ -33,11 +33,12 @@ namespace Api
             services.AddTransient(typeof(ISshActions), typeof(SSHClient));
             services.AddMediatR(typeof(GetAllProcessesCommandHandler).GetTypeInfo().Assembly);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddSpaStaticFiles(configuration =>
+         /*   services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist/template-app";
-            });
+            });*/
             services.AddSwaggerDocument();
+            services.AddMemoryCache();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -57,7 +58,7 @@ namespace Api
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseSpaStaticFiles();
+           // app.UseSpaStaticFiles();
             app.UseMvc();
             app.UseSpa(spa =>
             {
