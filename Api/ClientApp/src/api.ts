@@ -286,12 +286,11 @@ export class CommandClient {
     }
 }
 
-export class ExecuteCustomCommandViewModel implements IExecuteCustomCommandViewModel {
+export class BaseViewModel implements IBaseViewModel {
     isError!: boolean;
-    result?: string | undefined;
     error?: string | undefined;
 
-    constructor(data?: IExecuteCustomCommandViewModel) {
+    constructor(data?: IBaseViewModel) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -303,8 +302,41 @@ export class ExecuteCustomCommandViewModel implements IExecuteCustomCommandViewM
     init(data?: any) {
         if (data) {
             this.isError = data["isError"];
-            this.result = data["result"];
             this.error = data["error"];
+        }
+    }
+
+    static fromJS(data: any): BaseViewModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new BaseViewModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["isError"] = this.isError;
+        data["error"] = this.error;
+        return data; 
+    }
+}
+
+export interface IBaseViewModel {
+    isError: boolean;
+    error?: string | undefined;
+}
+
+export class ExecuteCustomCommandViewModel extends BaseViewModel implements IExecuteCustomCommandViewModel {
+    result?: string | undefined;
+
+    constructor(data?: IExecuteCustomCommandViewModel) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            this.result = data["result"];
         }
     }
 
@@ -317,17 +349,14 @@ export class ExecuteCustomCommandViewModel implements IExecuteCustomCommandViewM
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["isError"] = this.isError;
         data["result"] = this.result;
-        data["error"] = this.error;
+        super.toJSON(data);
         return data; 
     }
 }
 
-export interface IExecuteCustomCommandViewModel {
-    isError: boolean;
+export interface IExecuteCustomCommandViewModel extends IBaseViewModel {
     result?: string | undefined;
-    error?: string | undefined;
 }
 
 export abstract class BaseCommand implements IBaseCommand {
@@ -472,19 +501,15 @@ export class RebootCommand extends BaseCommand implements IRebootCommand {
 export interface IRebootCommand extends IBaseCommand {
 }
 
-export class CheckConnectionViewModel implements ICheckConnectionViewModel {
+export class CheckConnectionViewModel extends BaseViewModel implements ICheckConnectionViewModel {
     isAlive!: boolean;
 
     constructor(data?: ICheckConnectionViewModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
+        super(data);
     }
 
     init(data?: any) {
+        super.init(data);
         if (data) {
             this.isAlive = data["isAlive"];
         }
@@ -500,11 +525,12 @@ export class CheckConnectionViewModel implements ICheckConnectionViewModel {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["isAlive"] = this.isAlive;
+        super.toJSON(data);
         return data; 
     }
 }
 
-export interface ICheckConnectionViewModel {
+export interface ICheckConnectionViewModel extends IBaseViewModel {
     isAlive: boolean;
 }
 
@@ -535,19 +561,15 @@ export class CheckConnectionCommand extends BaseCommand implements ICheckConnect
 export interface ICheckConnectionCommand extends IBaseCommand {
 }
 
-export class SystemInfoViewModel implements ISystemInfoViewModel {
+export class SystemInfoViewModel extends BaseViewModel implements ISystemInfoViewModel {
     os?: string | undefined;
 
     constructor(data?: ISystemInfoViewModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
+        super(data);
     }
 
     init(data?: any) {
+        super.init(data);
         if (data) {
             this.os = data["os"];
         }
@@ -563,11 +585,12 @@ export class SystemInfoViewModel implements ISystemInfoViewModel {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["os"] = this.os;
+        super.toJSON(data);
         return data; 
     }
 }
 
-export interface ISystemInfoViewModel {
+export interface ISystemInfoViewModel extends IBaseViewModel {
     os?: string | undefined;
 }
 
@@ -598,19 +621,15 @@ export class GetSystemInfoCommand extends BaseCommand implements IGetSystemInfoC
 export interface IGetSystemInfoCommand extends IBaseCommand {
 }
 
-export class ProcessesListViewModel implements IProcessesListViewModel {
+export class ProcessesListViewModel extends BaseViewModel implements IProcessesListViewModel {
     processes?: ProcessInfo[] | undefined;
 
     constructor(data?: IProcessesListViewModel) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
+        super(data);
     }
 
     init(data?: any) {
+        super.init(data);
         if (data) {
             if (data["processes"] && data["processes"].constructor === Array) {
                 this.processes = [] as any;
@@ -634,11 +653,12 @@ export class ProcessesListViewModel implements IProcessesListViewModel {
             for (let item of this.processes)
                 data["processes"].push(item.toJSON());
         }
+        super.toJSON(data);
         return data; 
     }
 }
 
-export interface IProcessesListViewModel {
+export interface IProcessesListViewModel extends IBaseViewModel {
     processes?: ProcessInfo[] | undefined;
 }
 
