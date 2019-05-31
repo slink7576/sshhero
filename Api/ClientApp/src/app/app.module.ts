@@ -11,6 +11,8 @@ import { ConsoleComponent } from './components/console/console.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { SettingsComponent } from './components/settings/settings.component';
 import { ServersService } from './services/servers.service';
+import { ProcessesComponent } from './components/processes/processes.component';
+import { SharedMachineSelectorComponent } from './components/shared/machine-selector/shared-machine-selector.component';
 
 
 @NgModule({
@@ -18,7 +20,9 @@ import { ServersService } from './services/servers.service';
     AppComponent,
     ConsoleComponent,
     SidebarComponent,
-    SettingsComponent
+    SettingsComponent,
+    ProcessesComponent,
+    SharedMachineSelectorComponent
   ],
   imports: [
     ReactiveFormsModule,
@@ -31,6 +35,7 @@ import { ServersService } from './services/servers.service';
         { path: '', component: ConsoleComponent},
         { path: 'console', component: ConsoleComponent},
         { path: 'settings', component: SettingsComponent},
+        { path: 'processes', component: ProcessesComponent},
       //  { path: '**', component: PageNotFoundComponent }
       ]
     )

@@ -20,20 +20,12 @@ index = 0;
 commandsHistory = new Array<string>();
 commandFormGroup: FormGroup;
 
-servers = new Array<Credentials>();
-serversFormGroup: FormGroup;
+currentServer = new Credentials();
 
   ngOnInit() {
     this.commandFormGroup = this.formBuilder.group({
       Command: ['', ]
     });
-    this.serversFormGroup = this.formBuilder.group({
-      Server: ['', ]
-    });
-    this.servers = this.serversService.getServers();
-    if(this.servers.length != 0){
-      this.serversFormGroup.controls['Server'].setValue(this.servers[0]);
-    }
   }
   onClear(){
     this.result = '';
@@ -54,6 +46,10 @@ serversFormGroup: FormGroup;
     this.commandFormGroup.controls['Command'].setValue(this.commandsHistory[this.index]);
   }
 
+  onChangeServer(event:Credentials){
+    this.currentServer = event;;
+  }
+
   onSendCommand(){
     this.commandsHistory.push(this.commandFormGroup.controls['Command'].value);
     this.index = this.commandsHistory.length;
@@ -62,7 +58,7 @@ serversFormGroup: FormGroup;
     command.command = this.commandFormGroup.controls['Command'].value;
     this.commandFormGroup.controls['Command'].setValue('');
    
-    let cred = new Credentials(this.serversFormGroup.controls['Server'].value)
+    let cred = new Credentials(this.currentServer);
     command.credentials = cred;
 
     this.client.executeCustom(command).subscribe(data =>{

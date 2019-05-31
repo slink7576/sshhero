@@ -17,22 +17,9 @@
                         </form>
                 </div>
                 <div class="col-xl-6 col-12 text-center">
-                        <div class="">
-                                <p *ngIf="this.servers.length == 0">
-                                        Add a remote machine in settings
-                                </p>
-                                <form *ngIf="this.servers.length != 0" [formGroup]="serversFormGroup"
-                                        autocomplete="off">
-                                        <mat-form-field style="min-width:60%">
-                                                <mat-label>Current machine</mat-label>
-                                                <mat-select matInput formControlName="Server">
-                                                        <mat-option *ngFor="let server of servers" [value]="server">
-                                                                {{server.hostname + '@' + server.login}}
-                                                        </mat-option>
-                                                </mat-select>
-                                        </mat-form-field>
-                                </form>
-                        </div>
+                        <shared-machine-selector-component (onChangeServer)="onChangeServer($event)">
+                                
+                        </shared-machine-selector-component>
                 </div>
         </div>
 </div>
