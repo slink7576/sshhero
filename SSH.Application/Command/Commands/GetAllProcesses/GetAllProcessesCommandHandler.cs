@@ -29,29 +29,31 @@ namespace SSH.Application.Processes.Query.GetAllProcesses
                       .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 if (pingresult.Status.ToString() == "Success")
                 {
-                    using (var client = new SSHClient(request.Credentials))
-                    {
-                        _cache.Set(request.Credentials.Hostname, true, cacheEntryOptions);
-                        return new ProcessesListViewModel() { Processes = client.GetProcesses() };
-                    }
+                    alive = true;
+                    _cache.Set(request.Credentials.Hostname, true, cacheEntryOptions);
                 }
                 else
                 {
+                    alive = false;
                     _cache.Set(request.Credentials.Hostname, false, cacheEntryOptions);
-                    return new ProcessesListViewModel()
-                    {
-                        IsError = true,
-                        Processes = null,
-                        Error = "Couldnt connect to server"
-                    };
                 }
             }
-            return new ProcessesListViewModel()
+            if (alive)
             {
-                IsError = !alive,
-                Processes = null,
-                Error = alive ? "" : "Couldnt connect to server"
-            };
+                using (var client = new SSHClient(request.Credentials))
+                {
+                    return new ProcessesListViewModel() { Processes = client.GetProcesses() };
+                }
+            }
+            else
+            {
+                return new ProcessesListViewModel()
+                {
+                    IsError = true,
+                    Processes = null,
+                    Error = "Couldnt connect to server"
+                };
+            }
         }
     }
 }

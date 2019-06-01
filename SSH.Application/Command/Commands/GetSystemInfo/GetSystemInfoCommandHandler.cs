@@ -29,24 +29,31 @@ namespace SSH.Application.System.Commands.GetSystemInfo
                       .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 if (pingresult.Status.ToString() == "Success")
                 {
-                    using (var client = new SSHClient(request.Credentials))
-                    {
-                        _cache.Set(request.Credentials.Hostname, true, cacheEntryOptions);
-                        return new SystemInfoViewModel() { OS = client.GetInfo().Os };
-                    }
+                    alive = true;
+                    _cache.Set(request.Credentials.Hostname, true, cacheEntryOptions);
                 }
                 else
                 {
+                    alive = false;
                     _cache.Set(request.Credentials.Hostname, false, cacheEntryOptions);
-                    return new SystemInfoViewModel() { IsError = true, OS = null, Error = "Couldnt connect to server" };
                 }
             }
-            return new SystemInfoViewModel()
+            if (alive)
             {
-                IsError = !alive,
-                OS = null,
-                Error = alive ? "" : "Couldnt connect to server"
-            };
+                using (var client = new SSHClient(request.Credentials))
+                {
+                    return new SystemInfoViewModel() { OS = client.GetInfo().Os };
+                }
+            }
+            else
+            {
+                return new SystemInfoViewModel()
+                {
+                    IsError = true,
+                    OS = null,
+                    Error = "Couldnt connect to server"
+                };
+            }
         }
     }
 }

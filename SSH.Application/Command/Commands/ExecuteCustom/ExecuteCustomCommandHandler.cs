@@ -29,29 +29,36 @@ namespace SSH.Application.Command.Commands.ExecuteCustom
                       .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 if (pingresult.Status.ToString() == "Success")
                 {
-                    using (var client = new SSHClient(request.Credentials))
-                    {
-                        _cache.Set(request.Credentials.Hostname, true, cacheEntryOptions);
-                        var command = client.Execute(request.Command, request.IsSudo);
-                        return new ExecuteCustomCommandViewModel()
-                        {
-                            Result = command.Result,
-                            Error = command.Error,
-                            IsError = command.Error.Length == 0 ? false : true
-                        };
-                    }
+                    alive = true;
+                    _cache.Set(request.Credentials.Hostname, true, cacheEntryOptions);
                 }
                 else
                 {
+                    alive = false;
                     _cache.Set(request.Credentials.Hostname, false, cacheEntryOptions);
-                    return new ExecuteCustomCommandViewModel() { IsError = true, Error = "Couldnt connect to server" };
                 }
             }
-            return new ExecuteCustomCommandViewModel()
+            if (alive)
             {
-                IsError = !alive,
-                Error = alive ? "" : "Couldnt connect to server"
-            };
+                using (var client = new SSHClient(request.Credentials))
+                {
+                    var command = client.Execute(request.Command, request.IsSudo);
+                    return new ExecuteCustomCommandViewModel()
+                    {
+                        Result = command.Result,
+                        Error = command.Error,
+                        IsError = command.Error.Length == 0 ? false : true
+                    };
+                }
+            }
+            else
+            {
+                return new ExecuteCustomCommandViewModel()
+                {
+                    IsError = true,
+                    Error = "Couldnt connect to server"
+                };
+            }
         }
     }
 }

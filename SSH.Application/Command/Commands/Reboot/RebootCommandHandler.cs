@@ -26,22 +26,29 @@ namespace SSH.Application.Command.Commands.Reboot
                 var ping = new Ping();
                 PingReply pingresult = ping.Send(request.Credentials.Hostname);
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
-                       .SetSlidingExpiration(TimeSpan.FromMinutes(10));
+                      .SetSlidingExpiration(TimeSpan.FromMinutes(10));
                 if (pingresult.Status.ToString() == "Success")
                 {
-                    using (var client = new SSHClient(request.Credentials))
-                    {
-                        _cache.Set(request.Credentials.Hostname, true, cacheEntryOptions);
-                        return client.Reboot();
-                    }
+                    alive = true;
+                    _cache.Set(request.Credentials.Hostname, true, cacheEntryOptions);
                 }
                 else
                 {
+                    alive = false;
                     _cache.Set(request.Credentials.Hostname, false, cacheEntryOptions);
-                    return false;
                 }
             }
-            return alive;
+            if (alive)
+            {
+                using (var client = new SSHClient(request.Credentials))
+                {
+                    return client.Reboot();
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
