@@ -72,6 +72,7 @@ import {
     MatRippleModule,
     MatSelectModule,
     MatSidenavModule,
+    MatSortModule,
     MatSliderModule,
     MatSlideToggleModule,
     MatSnackBarModule,
