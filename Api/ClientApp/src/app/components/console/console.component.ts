@@ -13,8 +13,8 @@ export class ConsoleComponent {
 constructor(private formBuilder: FormBuilder, private serversService: ServersService,
    private client: CommandClient){}
 
-result:string = 'Hello world!';
-error:string;
+result = '';
+error = '';
 index = 0;
 
 commandsHistory = new Array<string>();
@@ -47,7 +47,9 @@ currentServer = new Credentials();
   }
 
   onChangeServer(event:Credentials){
-    this.currentServer = event;;
+    this.result = '';
+    this.error = '';
+    this.currentServer = event;
   }
 
   onSendCommand(){
