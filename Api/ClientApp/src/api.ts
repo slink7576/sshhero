@@ -284,6 +284,58 @@ export class CommandClient {
         }
         return _observableOf<ProcessesListViewModel | null>(<any>null);
     }
+
+    killProcess(command: KillProcessCommand): Observable<KillProcessViewModel | null> {
+        let url_ = this.baseUrl + "/api/Command/KillProcess";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processKillProcess(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processKillProcess(<any>response_);
+                } catch (e) {
+                    return <Observable<KillProcessViewModel | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<KillProcessViewModel | null>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processKillProcess(response: HttpResponseBase): Observable<KillProcessViewModel | null> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? KillProcessViewModel.fromJS(resultData200) : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<KillProcessViewModel | null>(<any>null);
+    }
 }
 
 export class BaseViewModel implements IBaseViewModel {
@@ -735,6 +787,66 @@ export class GetAllProcessesCommand extends BaseCommand implements IGetAllProces
 }
 
 export interface IGetAllProcessesCommand extends IBaseCommand {
+}
+
+export class KillProcessViewModel extends BaseViewModel implements IKillProcessViewModel {
+
+    constructor(data?: IKillProcessViewModel) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+    }
+
+    static fromJS(data: any): KillProcessViewModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new KillProcessViewModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IKillProcessViewModel extends IBaseViewModel {
+}
+
+export class KillProcessCommand extends BaseCommand implements IKillProcessCommand {
+    id!: number;
+
+    constructor(data?: IKillProcessCommand) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            this.id = data["id"];
+        }
+    }
+
+    static fromJS(data: any): KillProcessCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new KillProcessCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IKillProcessCommand extends IBaseCommand {
+    id: number;
 }
 
 export class SwaggerException extends Error {

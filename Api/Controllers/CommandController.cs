@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SSH.Application.Command.Commands.ExecuteCustom;
+using SSH.Application.Command.Commands.KillProcess;
 using SSH.Application.Command.Commands.Reboot;
 using SSH.Application.Connection.Command.CheckConnection;
 using SSH.Application.Processes.Query.GetAllProcesses;
@@ -43,6 +44,12 @@ namespace Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ProcessesListViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> GetAllProcesses([FromBody] GetAllProcessesCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(KillProcessViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> KillProcess([FromBody] KillProcessCommand command)
         {
             return Ok(await Mediator.Send(command));
         }

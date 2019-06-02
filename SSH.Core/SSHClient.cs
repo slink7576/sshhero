@@ -40,7 +40,7 @@ namespace SSH.Core
                 else
                     return _client.RunCommand(command);
             }
-            catch(SshConnectionException c)
+            catch (SshConnectionException c)
             {
                 return _client.CreateCommand(command);
             }
@@ -59,33 +59,26 @@ namespace SSH.Core
 
         public IEnumerable<ProcessInfo> GetProcesses()
         {
-            var command = _client.RunCommand("TERM=xterm ps -eo cmd,%mem,%cpu,pid --sort=-%mem | head");
-            var data = Regex.Split(string.Join("",Regex.Split(command.Result, "PID")[1]), "\n");
+            var command = _client.RunCommand("TERM=xterm ps -eo pid,%mem,%cpu,cmd");
+            var data = Regex.Split(string.Join("", Regex.Split(command.Result, "CMD")[1]), "\n");
 
+            var processes = new List<ProcessInfo>();
 
-          /*  foreach(var line in data.Where(elem => elem != ""))
+            foreach(var row in data.Where(element => element != ""))
             {
-                var items = Regex.Split(line, "  ").Where(elem => elem != "").ToList();
-                var cpu = Double.Parse(items[2], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US"));
-                var memory = Double.Parse(items[1], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US"));
-            }*/
-
-
-            var result = data.ToList().Select(line => {
-                var items = Regex.Split(line, "  ").Where(elem => elem != "").ToList();
-                if(items.Count != 0)
+                var tags = row.Split(' ').Where(tag => tag.Length != 0).ToList();
+                if(tags[3][0] != '[')
                 {
-                    return new ProcessInfo()
+                    processes.Add(new ProcessInfo()
                     {
-                        CPU = Double.Parse(items[2], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US")),
-                        Memory = Double.Parse(items[1], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US")),
-                        Name = items[0].Split(' ')[0],
-                        Id = Int32.Parse(items[3], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US"))
-                    };
+                        Id = Int32.Parse(tags[0], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US")),
+                        Memory = Double.Parse(tags[1], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US")),
+                        CPU = Double.Parse(tags[2], NumberStyles.Currency, CultureInfo.GetCultureInfo("en-US")),
+                        Name = tags[3]
+                    });
                 }
-                return null;
-            }).Where(elem => elem != null).ToList();
-            return result;
+            }
+            return processes.OrderBy(proc => proc.CPU).Reverse();
         }
 
         public SystemInfo GetInfo()
@@ -102,6 +95,12 @@ namespace SSH.Core
                 else
                     return false;
             }
+        }
+
+        public SshCommand KillProcess(int id)
+        {
+            var cmd = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S kill " + id);
+            return cmd;
         }
     }
 }

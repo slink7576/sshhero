@@ -12,5 +12,6 @@ namespace SSH.Core.Interfaces
         SystemInfo GetInfo();
         bool CheckConnection();
         bool Reboot();
+        SshCommand KillProcess(int id);
     }
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { CommandClient, ProcessInfo, Credentials, GetAllProcessesCommand } from "src/api";
+import { CommandClient, ProcessInfo, Credentials, GetAllProcessesCommand, KillProcessCommand } from "src/api";
 import { MatTableDataSource, MatSort } from "@angular/material";
 
 @Component({
@@ -20,7 +20,21 @@ export class ProcessesComponent implements OnInit{
 
     constructor(private client: CommandClient){}
     ngOnInit(){
-
+        setInterval(() => {
+            let comm = new GetAllProcessesCommand();
+            comm.credentials = new Credentials(this.currentServer);
+            this.client.getAllProcesses(comm).subscribe(data => {
+                if(!data.isError){
+                    this.error = '';
+                    this.processes = data.processes;
+                    this.dataSource = new MatTableDataSource(this.processes);
+                    this.dataSource.sort = this.sort;
+                }else{
+                    this.processes = new Array<ProcessInfo>();
+                    this.error = data.error;
+                }
+            });
+        },2000);
     }
     onChangeServer(event){
         this.currentServer = event;
@@ -38,7 +52,17 @@ export class ProcessesComponent implements OnInit{
             }
         });
     }
-    onKillProcess(a){
-        console.log(a)
+    onKillProcess(id){
+        let command = new KillProcessCommand();
+        command.credentials = new Credentials(this.currentServer);
+        command.id = id;
+        this.client.killProcess(command).subscribe(data =>{
+            if(!data.isError){
+                let elem = this.processes.find(el => el.id == id);
+                let ind = this.processes.indexOf(elem);
+                this.processes.splice(ind, 1);
+                this.dataSource = new MatTableDataSource(this.processes);
+            }
+        });
     }
 }
