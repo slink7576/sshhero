@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ServersService } from "src/app/services/servers.service";
-import { Credentials, CommandClient, CheckConnectionCommand, CheckConnectionViewModel } from "src/api";
+import { Credentials, CommandClient, CheckConnectionCommand, CheckConnectionViewModel, GetSystemInfoCommand } from "src/api";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { ServerViewModel } from "src/entities/ServerViewModel";
 
@@ -26,6 +26,16 @@ export class SettingsComponent implements OnInit {
         let obj = new ServerViewModel();
         obj.isAlive = data.isAlive;
         obj.credentials = credentials;
+        obj.os = '';
+        if(obj.isAlive){
+          let getInfoCommand = new GetSystemInfoCommand();
+          getInfoCommand.credentials = credentials;
+          this.client.getSystemInfo(getInfoCommand).subscribe(data => {
+            if(!data.isError){
+              obj.os = data.os
+            }
+          });
+        }
         this.servers.push(obj);
       });
       

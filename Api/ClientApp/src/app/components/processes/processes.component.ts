@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, ViewChild, OnDestroy } from "@angular/core";
 import { CommandClient, ProcessInfo, Credentials, GetAllProcessesCommand, KillProcessCommand } from "src/api";
 import { MatTableDataSource, MatSort } from "@angular/material";
 
@@ -8,19 +8,24 @@ import { MatTableDataSource, MatSort } from "@angular/material";
     styleUrls: ['./processes.component.css']
 })
 
-export class ProcessesComponent implements OnInit{
+export class ProcessesComponent implements OnInit, OnDestroy{
 
     processes = new Array<ProcessInfo>();
     currentServer = new Credentials();
     error = '';
     displayedColumns: string[] = ['id', 'name', 'cpu', 'memory', 'kill'];
     dataSource: MatTableDataSource<ProcessInfo>;
-  
+    refreshProcessInterval: any;
     @ViewChild(MatSort) sort: MatSort;
 
     constructor(private client: CommandClient){}
+
+    ngOnDestroy() {
+        clearInterval(this.refreshProcessInterval);
+    }
+
     ngOnInit(){
-        setInterval(() => {
+        this.refreshProcessInterval = setInterval(() => {
             let comm = new GetAllProcessesCommand();
             comm.credentials = new Credentials(this.currentServer);
             this.client.getAllProcesses(comm).subscribe(data => {
