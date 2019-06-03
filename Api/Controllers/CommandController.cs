@@ -24,7 +24,7 @@ namespace Api.Controllers
             return Ok(await Mediator.Send(command));
         }
         [HttpPost]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(RebootViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Reboot([FromBody] RebootCommand command)
         {
             return Ok(await Mediator.Send(command));

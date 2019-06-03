@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SSH.Application.Base
+namespace SSH.Core.Commands
 {
-    public abstract class BaseViewModel
+    public abstract class BaseCommandResponse
     {
         public bool IsError { get; set; }
         public string Error { get; set; }

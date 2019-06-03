@@ -7,15 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net.NetworkInformation;
 using Microsoft.Extensions.Caching.Memory;
+using SSH.Application.Base;
 
 namespace SSH.Application.System.Commands.GetSystemInfo
 {
-    public class GetSystemInfoCommandHandler : IRequestHandler<GetSystemInfoCommand, SystemInfoViewModel>
+    public class GetSystemInfoCommandHandler : BaseCommandHandler, IRequestHandler<GetSystemInfoCommand, SystemInfoViewModel>
     {
-        private IMemoryCache _cache;
-        public GetSystemInfoCommandHandler(IMemoryCache memoryCache)
+        public GetSystemInfoCommandHandler(IMemoryCache memoryCache) : base(memoryCache)
         {
-            _cache = memoryCache;
         }
 
         public async Task<SystemInfoViewModel> Handle(GetSystemInfoCommand request, CancellationToken cancellationToken)
@@ -42,7 +41,13 @@ namespace SSH.Application.System.Commands.GetSystemInfo
             {
                 using (var client = new SSHClient(request.Credentials))
                 {
-                    return new SystemInfoViewModel() { OS = client.GetInfo().Os };
+                    var response = client.GetInfo();
+                    return new SystemInfoViewModel()
+                    {
+                        IsError = response.IsError,
+                        Error = response.Error,
+                        OS = response.Information.Os
+                    };
                 }
             }
             else

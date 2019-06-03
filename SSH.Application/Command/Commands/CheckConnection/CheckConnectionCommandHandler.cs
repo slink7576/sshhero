@@ -11,12 +11,10 @@ using System.Threading.Tasks;
 
 namespace SSH.Application.Connection.Command.CheckConnection
 {
-    public class CheckConnectionCommandHandler : IRequestHandler<CheckConnectionCommand, CheckConnectionViewModel>
+    public class CheckConnectionCommandHandler : BaseCommandHandler, IRequestHandler<CheckConnectionCommand, CheckConnectionViewModel>
     {
-        private IMemoryCache _cache;
-        public CheckConnectionCommandHandler(IMemoryCache memoryCache)
+        public CheckConnectionCommandHandler(IMemoryCache memoryCache) : base(memoryCache)
         {
-            _cache = memoryCache;
         }
 
         public async Task<CheckConnectionViewModel> Handle(CheckConnectionCommand request, CancellationToken cancellationToken)

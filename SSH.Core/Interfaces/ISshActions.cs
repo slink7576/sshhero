@@ -1,4 +1,5 @@
 ﻿using Renci.SshNet;
+using SSH.Core.Commands;
 using SSH.Core.Entities;
 using System;
 using System.Collections.Generic;
@@ -6,12 +7,14 @@ using System.Text;
 
 namespace SSH.Core.Interfaces
 {
-    public interface ISshActions
+    public interface ISSHActions
     {
-        IEnumerable<ProcessInfo> GetProcesses();
-        SystemInfo GetInfo();
-        bool CheckConnection();
-        bool Reboot();
-        SshCommand KillProcess(int id);
+        GetProcessesCommandResponse GetProcesses();
+        GetSystemInfoCommandResponse GetInfo();
+        CheckConnectionCommandResponse CheckConnection();
+        RebootCommandResponse Reboot();
+        KillProcessCommandResponse KillProcess(int id);
+        ExecuteCustomCommandResponse Execute(string command, bool isSudo);
+        GetFilesCommandResponse GetFiles(string path);
     }
 }

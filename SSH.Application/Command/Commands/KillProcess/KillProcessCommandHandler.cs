@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
+using SSH.Application.Base;
 using SSH.Core;
 using System;
 using System.Collections.Generic;
@@ -10,12 +11,10 @@ using System.Threading.Tasks;
 
 namespace SSH.Application.Command.Commands.KillProcess
 {
-    public class KillProcessCommandHandler : IRequestHandler<KillProcessCommand, KillProcessViewModel>
+    public class KillProcessCommandHandler : BaseCommandHandler, IRequestHandler<KillProcessCommand, KillProcessViewModel>
     {
-        private IMemoryCache _cache;
-        public KillProcessCommandHandler(IMemoryCache memoryCache)
+        public KillProcessCommandHandler(IMemoryCache memoryCache) : base(memoryCache)
         {
-            _cache = memoryCache;
         }
 
         public async Task<KillProcessViewModel> Handle(KillProcessCommand request, CancellationToken cancellationToken)
@@ -42,11 +41,11 @@ namespace SSH.Application.Command.Commands.KillProcess
             {
                 using (var client = new SSHClient(request.Credentials))
                 {
-                    var command = client.KillProcess(request.Id);
+                    var response = client.KillProcess(request.Id);
                     return new KillProcessViewModel()
                     {
-                        IsError = command.ExitStatus != 0 ? true : false,
-                        Error = command.Error
+                        IsError = response.IsError,
+                        Error = response.Error
                     };
                 }
             }

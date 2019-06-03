@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
+using SSH.Application.Base;
 using SSH.Core;
 using System;
 using System.Collections.Generic;
@@ -10,15 +11,13 @@ using System.Threading.Tasks;
 
 namespace SSH.Application.Command.Commands.Reboot
 {
-    public class RebootCommandHandler : IRequestHandler<RebootCommand, bool>
+    public class RebootCommandHandler : BaseCommandHandler, IRequestHandler<RebootCommand, RebootViewModel>
     {
-        private IMemoryCache _cache;
-        public RebootCommandHandler(IMemoryCache memoryCache)
+        public RebootCommandHandler(IMemoryCache memoryCache) : base(memoryCache)
         {
-            _cache = memoryCache;
         }
 
-        public async Task<bool> Handle(RebootCommand request, CancellationToken cancellationToken)
+        public async Task<RebootViewModel> Handle(RebootCommand request, CancellationToken cancellationToken)
         {
             bool alive = false;
             if (!_cache.TryGetValue(request.Credentials.Hostname, out alive))
@@ -42,12 +41,21 @@ namespace SSH.Application.Command.Commands.Reboot
             {
                 using (var client = new SSHClient(request.Credentials))
                 {
-                    return client.Reboot();
+                    var response = client.Reboot();
+                    return new RebootViewModel()
+                    {
+                        IsError = response.IsError,
+                        Error = response.Error
+                    };
                 }
             }
             else
             {
-                return false;
+                return new RebootViewModel()
+                {
+                    IsError = true,
+                    Error = "Couldnt connect to server"
+                };
             }
         }
     }

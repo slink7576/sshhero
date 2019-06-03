@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
+using SSH.Application.Base;
 using SSH.Core;
 using System;
 using System.Collections.Generic;
@@ -10,12 +11,10 @@ using System.Threading.Tasks;
 
 namespace SSH.Application.Command.Commands.ExecuteCustom
 {
-    public class ExecuteCustomCommandHandler : IRequestHandler<ExecuteCustomCommand, ExecuteCustomCommandViewModel>
+    public class ExecuteCustomCommandHandler : BaseCommandHandler, IRequestHandler<ExecuteCustomCommand, ExecuteCustomCommandViewModel>
     {
-        private IMemoryCache _cache;
-        public ExecuteCustomCommandHandler(IMemoryCache memoryCache)
+        public ExecuteCustomCommandHandler(IMemoryCache memoryCache) : base(memoryCache)
         {
-            _cache = memoryCache;
         }
 
         public async Task<ExecuteCustomCommandViewModel> Handle(ExecuteCustomCommand request, CancellationToken cancellationToken)
@@ -44,10 +43,10 @@ namespace SSH.Application.Command.Commands.ExecuteCustom
                 {
                     var command = client.Execute(request.Command, request.IsSudo);
                     return new ExecuteCustomCommandViewModel()
-                    {
-                        Result = command.Result,
+                    {                    
+                        IsError = command.IsError,
                         Error = command.Error,
-                        IsError = command.Error.Length == 0 ? false : true
+                        Result = command.Result
                     };
                 }
             }

@@ -1,5 +1,6 @@
 ﻿using Renci.SshNet;
 using Renci.SshNet.Common;
+using SSH.Core.Commands;
 using SSH.Core.Entities;
 using SSH.Core.Interfaces;
 using System;
@@ -11,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace SSH.Core
 {
-    public class SSHClient : IDisposable, ISshActions
+    public class SSHClient : IDisposable, ISSHActions
     {
         private readonly SshClient _client;
         private readonly Credentials _credentials;
@@ -31,43 +32,53 @@ namespace SSH.Core
             _client.Connect();
         }
 
-        public SshCommand Execute(string command, bool isSudo)
-        {
-            try
-            {
-                if (isSudo)
-                    return _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S " + command);
-                else
-                    return _client.RunCommand(command);
-            }
-            catch (SshConnectionException c)
-            {
-                return _client.CreateCommand(command);
-            }
-        }
-
         public void Dispose()
         {
             _client.Disconnect();
             _client.Dispose();
         }
 
-        public bool CheckConnection()
+        public ExecuteCustomCommandResponse Execute(string command, bool isSudo)
         {
-            return _client.IsConnected;
+            SshCommand comm = null;
+            if (isSudo)
+            {
+                comm = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S " + command);
+            }
+            else
+            {
+                comm = _client.RunCommand(command);
+            }
+            return new ExecuteCustomCommandResponse()
+            {
+                IsError = comm.ExitStatus == 0 ? false : true,
+                Error = comm.Error,
+                Result = comm.Result
+            };
+        }      
+
+        public CheckConnectionCommandResponse CheckConnection()
+        {
+            var command = _client.RunCommand("echo 1");
+            return new CheckConnectionCommandResponse()
+            {
+                IsConnected = command.ExitStatus == 0 ? true : false,
+                IsError = command.ExitStatus == 0 ? false : true,
+                Error = command.Error
+            };
         }
 
-        public IEnumerable<ProcessInfo> GetProcesses()
+        public GetProcessesCommandResponse GetProcesses()
         {
             var command = _client.RunCommand("TERM=xterm ps -eo pid,%mem,%cpu,cmd");
             var data = Regex.Split(string.Join("", Regex.Split(command.Result, "CMD")[1]), "\n");
 
             var processes = new List<ProcessInfo>();
 
-            foreach(var row in data.Where(element => element != ""))
+            foreach (var row in data.Where(element => element != ""))
             {
                 var tags = row.Split(' ').Where(tag => tag.Length != 0).ToList();
-                if(tags[3][0] != '[')
+                if (tags[3][0] != '[')
                 {
                     processes.Add(new ProcessInfo()
                     {
@@ -78,29 +89,51 @@ namespace SSH.Core
                     });
                 }
             }
-            return processes.OrderBy(proc => proc.CPU).Reverse();
-        }
-
-        public SystemInfo GetInfo()
-        {
-            return new SystemInfo() { Os = _client.RunCommand("uname -v").Result };
-        }
-
-        public bool Reboot()
-        {
-            using (var cmd = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S shutdown -r"))
+            return new GetProcessesCommandResponse()
             {
-                if (cmd.ExitStatus == 0)
-                    return true;
-                else
-                    return false;
-            }
+                Processes = processes.OrderBy(proc => proc.CPU).Reverse(),
+                IsError = command.ExitStatus == 0 ? false : true,
+                Error = command.Error
+            };
         }
 
-        public SshCommand KillProcess(int id)
+        public GetSystemInfoCommandResponse GetInfo()
         {
-            var cmd = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S kill " + id);
-            return cmd;
+            var command = _client.RunCommand("uname -v");
+            return new GetSystemInfoCommandResponse()
+            {
+                IsError = command.ExitStatus == 0 ? false : true,
+                Error = command.Error,
+                Information = new SystemInfo()
+                {
+                    Os = command.Result
+                }
+            };
+        }
+
+        public RebootCommandResponse Reboot()
+        {
+            var command = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S shutdown -r");
+            return new RebootCommandResponse()
+            {
+                IsError = command.ExitStatus == 0 ? false : true,
+                Error = command.Error
+            };
+        }
+
+        public KillProcessCommandResponse KillProcess(int id)
+        {
+            var command = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S kill " + id);
+            return new KillProcessCommandResponse()
+            {
+                IsError = command.ExitStatus == 0 ? false : true,
+                Error = command.Error
+            };
+        }
+
+        public GetFilesCommandResponse GetFiles(string path)
+        {
+            throw new NotImplementedException();
         }
     }
 }

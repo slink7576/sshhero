@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Memory;
+using SSH.Application.Base;
 using SSH.Core;
 using System;
 using System.Collections.Generic;
@@ -10,12 +11,10 @@ using System.Threading.Tasks;
 
 namespace SSH.Application.Processes.Query.GetAllProcesses
 {
-    public class GetAllProcessesCommandHandler : IRequestHandler<GetAllProcessesCommand, ProcessesListViewModel>
+    public class GetAllProcessesCommandHandler : BaseCommandHandler, IRequestHandler<GetAllProcessesCommand, ProcessesListViewModel>
     {
-        private IMemoryCache _cache;
-        public GetAllProcessesCommandHandler(IMemoryCache memoryCache)
+        public GetAllProcessesCommandHandler(IMemoryCache memoryCache) : base(memoryCache)
         {
-            _cache = memoryCache;
         }
 
         public async Task<ProcessesListViewModel> Handle(GetAllProcessesCommand request, CancellationToken cancellationToken)
@@ -42,7 +41,13 @@ namespace SSH.Application.Processes.Query.GetAllProcesses
             {
                 using (var client = new SSHClient(request.Credentials))
                 {
-                    return new ProcessesListViewModel() { Processes = client.GetProcesses() };
+                    var response = client.GetProcesses();
+                    return new ProcessesListViewModel()
+                    {
+                        Processes = response.Processes,
+                        IsError = response.IsError,
+                        Error = response.Error
+                    };
                 }
             }
             else
