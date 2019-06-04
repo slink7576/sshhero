@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using SSH.Application.Command.Commands.ExecuteCustom;
+using SSH.Application.Command.Commands.GetFiles;
 using SSH.Application.Command.Commands.KillProcess;
 using SSH.Application.Command.Commands.Reboot;
 using SSH.Application.Connection.Command.CheckConnection;
@@ -53,5 +54,12 @@ namespace Api.Controllers
         {
             return Ok(await Mediator.Send(command));
         }
+        [HttpPost]
+        [ProducesResponseType(typeof(GetFilesViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetFiles([FromBody] GetFilesCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
+
     }
 }

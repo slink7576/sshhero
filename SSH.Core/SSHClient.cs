@@ -55,7 +55,7 @@ namespace SSH.Core
                 Error = comm.Error,
                 Result = comm.Result
             };
-        }      
+        }
 
         public CheckConnectionCommandResponse CheckConnection()
         {
@@ -131,9 +131,59 @@ namespace SSH.Core
             };
         }
 
-        public GetFilesCommandResponse GetFiles(string path)
+        public GetFilesCommandResponse GetFiles(string path = "")
         {
-            throw new NotImplementedException();
+            SshCommand folderCommand = null;
+            SshCommand filesCommand = null;
+            var files = new List<FileNode>();
+            var folders = new List<FileNode>();
+            if (path.Length != 0)
+            {
+                filesCommand = _client.RunCommand("cd " + '"' + path + '"' + " && ls -p | grep -v /");
+                folderCommand = _client.RunCommand("cd " + '"' + path + '"' + " && ls -dm */");
+            }
+            else
+            {
+                path = _client.RunCommand("pwd").Result;
+                filesCommand = _client.RunCommand("ls -p | grep -v /");
+                folderCommand = _client.RunCommand("ls -dm */");
+            }
+            if (folderCommand.ExitStatus == 0)
+            {
+                folders = folderCommand.Result.Split(',').Select(element =>
+                {
+                    var folderName = element[0] == ' ' ? element.Substring(1) : element;
+                    folderName = folderName.Contains("\n") ? folderName.Replace("\n", "") : folderName;
+                    folderName = folderName.Contains("/") ? folderName.Replace("/", "") : folderName;
+                    return new FileNode()
+                    {
+                        Name = folderName,
+                        IsFile = false
+                    };
+                }).ToList();
+            }
+            if (filesCommand.ExitStatus == 0)
+            {
+                files = filesCommand.Result.Split('\n').Where(element => element != "").Select(element =>
+                {
+                    var fileName = element[0] == ' ' ? element.Substring(1) : element;
+                    fileName = fileName.Contains("\n") ? fileName.Replace("\n", "") : fileName;
+                    fileName = fileName.Contains("/") ? fileName.Replace("/", "") : fileName;
+                    return new FileNode()
+                    {
+                        Name = fileName,
+                        IsFile = true
+                    };
+                }).ToList();
+            }
+            return new GetFilesCommandResponse()
+            {
+                IsError = false,
+                CurrentPath = path.Contains("\n") ? path.Replace("\n", "") : path,
+                Nodes = folders.Concat(files)
+                    .OrderBy(element => element.IsFile).ToList()
+            };
+
         }
     }
 }

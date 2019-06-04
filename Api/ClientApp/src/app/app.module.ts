@@ -13,6 +13,7 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { ServersService } from './services/servers.service';
 import { ProcessesComponent } from './components/processes/processes.component';
 import { SharedMachineSelectorComponent } from './components/shared/machine-selector/shared-machine-selector.component';
+import { FilesComponent } from './components/files/files.component';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import { SharedMachineSelectorComponent } from './components/shared/machine-sele
     SidebarComponent,
     SettingsComponent,
     ProcessesComponent,
+    FilesComponent,
     SharedMachineSelectorComponent
   ],
   imports: [
@@ -36,6 +38,7 @@ import { SharedMachineSelectorComponent } from './components/shared/machine-sele
         { path: 'console', component: ConsoleComponent},
         { path: 'settings', component: SettingsComponent},
         { path: 'processes', component: ProcessesComponent},
+        { path: 'files', component: FilesComponent},
       //  { path: '**', component: PageNotFoundComponent }
       ]
     )

@@ -77,7 +77,7 @@ export class CommandClient {
         return _observableOf<ExecuteCustomCommandViewModel | null>(<any>null);
     }
 
-    reboot(command: RebootCommand): Observable<boolean> {
+    reboot(command: RebootCommand): Observable<RebootViewModel | null> {
         let url_ = this.baseUrl + "/api/Command/Reboot";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -100,14 +100,14 @@ export class CommandClient {
                 try {
                     return this.processReboot(<any>response_);
                 } catch (e) {
-                    return <Observable<boolean>><any>_observableThrow(e);
+                    return <Observable<RebootViewModel | null>><any>_observableThrow(e);
                 }
             } else
-                return <Observable<boolean>><any>_observableThrow(response_);
+                return <Observable<RebootViewModel | null>><any>_observableThrow(response_);
         }));
     }
 
-    protected processReboot(response: HttpResponseBase): Observable<boolean> {
+    protected processReboot(response: HttpResponseBase): Observable<RebootViewModel | null> {
         const status = response.status;
         const responseBlob = 
             response instanceof HttpResponse ? response.body : 
@@ -118,7 +118,7 @@ export class CommandClient {
             return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = resultData200 !== undefined ? resultData200 : <any>null;
+            result200 = resultData200 ? RebootViewModel.fromJS(resultData200) : <any>null;
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -126,7 +126,7 @@ export class CommandClient {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             }));
         }
-        return _observableOf<boolean>(<any>null);
+        return _observableOf<RebootViewModel | null>(<any>null);
     }
 
     checkConnection(command: CheckConnectionCommand): Observable<CheckConnectionViewModel | null> {
@@ -336,9 +336,61 @@ export class CommandClient {
         }
         return _observableOf<KillProcessViewModel | null>(<any>null);
     }
+
+    getFiles(command: GetFilesCommand): Observable<GetFilesViewModel | null> {
+        let url_ = this.baseUrl + "/api/Command/GetFiles";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFiles(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFiles(<any>response_);
+                } catch (e) {
+                    return <Observable<GetFilesViewModel | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<GetFilesViewModel | null>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetFiles(response: HttpResponseBase): Observable<GetFilesViewModel | null> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? GetFilesViewModel.fromJS(resultData200) : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<GetFilesViewModel | null>(<any>null);
+    }
 }
 
-export class BaseViewModel implements IBaseViewModel {
+export abstract class BaseViewModel implements IBaseViewModel {
     isError!: boolean;
     error?: string | undefined;
 
@@ -360,9 +412,7 @@ export class BaseViewModel implements IBaseViewModel {
 
     static fromJS(data: any): BaseViewModel {
         data = typeof data === 'object' ? data : {};
-        let result = new BaseViewModel();
-        result.init(data);
-        return result;
+        throw new Error("The abstract class 'BaseViewModel' cannot be instantiated.");
     }
 
     toJSON(data?: any) {
@@ -524,6 +574,33 @@ export interface ICredentials {
     hostname?: string | undefined;
     password?: string | undefined;
     login?: string | undefined;
+}
+
+export class RebootViewModel extends BaseViewModel implements IRebootViewModel {
+
+    constructor(data?: IRebootViewModel) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+    }
+
+    static fromJS(data: any): RebootViewModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new RebootViewModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IRebootViewModel extends IBaseViewModel {
 }
 
 export class RebootCommand extends BaseCommand implements IRebootCommand {
@@ -847,6 +924,124 @@ export class KillProcessCommand extends BaseCommand implements IKillProcessComma
 
 export interface IKillProcessCommand extends IBaseCommand {
     id: number;
+}
+
+export class GetFilesViewModel extends BaseViewModel implements IGetFilesViewModel {
+    nodes?: FileNode[] | undefined;
+    path?: string | undefined;
+
+    constructor(data?: IGetFilesViewModel) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            if (data["nodes"] && data["nodes"].constructor === Array) {
+                this.nodes = [] as any;
+                for (let item of data["nodes"])
+                    this.nodes!.push(FileNode.fromJS(item));
+            }
+            this.path = data["path"];
+        }
+    }
+
+    static fromJS(data: any): GetFilesViewModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetFilesViewModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.nodes && this.nodes.constructor === Array) {
+            data["nodes"] = [];
+            for (let item of this.nodes)
+                data["nodes"].push(item.toJSON());
+        }
+        data["path"] = this.path;
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IGetFilesViewModel extends IBaseViewModel {
+    nodes?: FileNode[] | undefined;
+    path?: string | undefined;
+}
+
+export class FileNode implements IFileNode {
+    name?: string | undefined;
+    isFile!: boolean;
+
+    constructor(data?: IFileNode) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(data?: any) {
+        if (data) {
+            this.name = data["name"];
+            this.isFile = data["isFile"];
+        }
+    }
+
+    static fromJS(data: any): FileNode {
+        data = typeof data === 'object' ? data : {};
+        let result = new FileNode();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["isFile"] = this.isFile;
+        return data; 
+    }
+}
+
+export interface IFileNode {
+    name?: string | undefined;
+    isFile: boolean;
+}
+
+export class GetFilesCommand extends BaseCommand implements IGetFilesCommand {
+    path?: string | undefined;
+
+    constructor(data?: IGetFilesCommand) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            this.path = data["path"];
+        }
+    }
+
+    static fromJS(data: any): GetFilesCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetFilesCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["path"] = this.path;
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IGetFilesCommand extends IBaseCommand {
+    path?: string | undefined;
 }
 
 export class SwaggerException extends Error {
