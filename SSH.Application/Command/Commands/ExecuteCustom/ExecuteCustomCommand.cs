@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SSH.Application.Command.Commands.ExecuteCustom
 {
-    public class ExecuteCustomCommand : BaseCommand, IRequest<ExecuteCustomCommandViewModel>
+    public class ExecuteCustomCommand : BaseCommand, IRequest<ExecuteCustomViewModel>
     {
         public string Command { get; set; }
         public bool IsSudo { get; set; }

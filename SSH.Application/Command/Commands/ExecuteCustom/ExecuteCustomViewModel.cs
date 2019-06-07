@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SSH.Application.Command.Commands.ExecuteCustom
 {
-    public class ExecuteCustomCommandViewModel : BaseViewModel
+    public class ExecuteCustomViewModel : BaseViewModel
     {
         public string Result { get; set; }
     }

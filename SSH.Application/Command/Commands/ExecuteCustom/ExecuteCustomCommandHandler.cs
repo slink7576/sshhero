@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace SSH.Application.Command.Commands.ExecuteCustom
 {
-    public class ExecuteCustomCommandHandler : BaseCommandHandler, IRequestHandler<ExecuteCustomCommand, ExecuteCustomCommandViewModel>
+    public class ExecuteCustomCommandHandler : BaseCommandHandler, IRequestHandler<ExecuteCustomCommand, ExecuteCustomViewModel>
     {
         public ExecuteCustomCommandHandler(IMemoryCache memoryCache) : base(memoryCache)
         {
         }
 
-        public async Task<ExecuteCustomCommandViewModel> Handle(ExecuteCustomCommand request, CancellationToken cancellationToken)
+        public async Task<ExecuteCustomViewModel> Handle(ExecuteCustomCommand request, CancellationToken cancellationToken)
         {
             bool alive = false;
             if (!_cache.TryGetValue(request.Credentials.Hostname, out alive))
@@ -42,7 +42,7 @@ namespace SSH.Application.Command.Commands.ExecuteCustom
                 using (var client = new SSHClient(request.Credentials))
                 {
                     var command = client.Execute(request.Command, request.IsSudo);
-                    return new ExecuteCustomCommandViewModel()
+                    return new ExecuteCustomViewModel()
                     {                    
                         IsError = command.IsError,
                         Error = command.Error,
@@ -52,7 +52,7 @@ namespace SSH.Application.Command.Commands.ExecuteCustom
             }
             else
             {
-                return new ExecuteCustomCommandViewModel()
+                return new ExecuteCustomViewModel()
                 {
                     IsError = true,
                     Error = "Couldnt connect to server"
