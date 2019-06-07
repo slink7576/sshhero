@@ -178,12 +178,65 @@ namespace SSH.Core
             }
             return new GetFilesCommandResponse()
             {
-                IsError = false,
+                IsError = filesCommand.ExitStatus == 1 &&
+                    folderCommand.ExitStatus == 1 ? true : false,
+                Error = filesCommand.Error + "\n" + folderCommand.Error,
                 CurrentPath = path.Contains("\n") ? path.Replace("\n", "") : path,
                 Nodes = folders.Concat(files)
                     .OrderBy(element => element.IsFile).ToList()
             };
 
+        }
+
+        public DeleteObjectCommandResponse Delete(string path, string name)
+        {
+            var command = _client.RunCommand("rm " + path + "/" + name + " -R");
+            return new DeleteObjectCommandResponse()
+            {
+                IsError = command.ExitStatus == 0 ? false : true,
+                Error = command.Error,
+                Nodes = GetFiles(path).Nodes,
+            };
+        }
+
+        public CreateObjectCommandResponse Create(string path, string name, bool isFile)
+        {
+            SshCommand command = null;
+            if (isFile)
+            {
+                command = _client.RunCommand("touch " + path + "/" + name);
+            }
+            else
+            {
+                command = _client.RunCommand("mkdir " + path + "/" + name);
+            }
+            return new CreateObjectCommandResponse()
+            {
+                IsError = command.ExitStatus == 0 ? false : true,
+                Error = command.Error,
+                Nodes = GetFiles(path).Nodes
+            };
+        }
+
+        public CopyObjectCommandResponse Copy(string from, string to)
+        {
+            var command = _client.RunCommand("cp " + from + " " + to);
+            return new CopyObjectCommandResponse()
+            {
+                IsError = command.ExitStatus == 0 ? false : true,
+                Error = command.Error,
+                Nodes = GetFiles(to).Nodes
+            };
+        }
+
+        public GetFileBodyCommandResponse GetFile(string file)
+        {
+            var command = _client.RunCommand("cat " + file);
+            return new GetFileBodyCommandResponse(){
+                IsError = command.ExitStatus == 0 ? false : true,
+                Error = command.Error,
+                Data = command.Result
+            };
         }
     }
 }

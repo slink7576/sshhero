@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SSH.Application.Command.Commands.CreateObject;
+using SSH.Application.Command.Commands.DeleteObject;
 using SSH.Application.Command.Commands.ExecuteCustom;
 using SSH.Application.Command.Commands.GetFiles;
 using SSH.Application.Command.Commands.KillProcess;
@@ -19,7 +21,7 @@ namespace Api.Controllers
     public class CommandController : BaseController
     {
         [HttpPost]
-        [ProducesResponseType(typeof(ExecuteCustomCommandViewModel), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ExecuteCustomViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ExecuteCustom([FromBody] ExecuteCustomCommand command)
         {
             return Ok(await Mediator.Send(command));
@@ -60,6 +62,17 @@ namespace Api.Controllers
         {
             return Ok(await Mediator.Send(command));
         }
-
+        [HttpPost]
+        [ProducesResponseType(typeof(CreateObjectViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Create([FromBody] CreateObjectCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(DeleteObjectViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Delete([FromBody] DeleteObjectCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
     }
 }
