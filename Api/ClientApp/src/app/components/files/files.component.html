@@ -1,7 +1,5 @@
 <div class="p-5">
         <mat-card class="p-2">
-
-
                 <div class="row m-0 p-0">
                         <div class="col-1 pt-2 text-left">
                                 <button mat-flat-button (click)="onBack()">
@@ -11,10 +9,17 @@
                                 </button>
                         </div>
                         <div class="col-5 text-left pt-3">
-                                <input *ngIf="pathList[currentPathIndex] != undefined" matInput type="text" (change)="onPathChange($event)" 
-                                [(value)]="pathList[currentPathIndex]">
+                                <input *ngIf="pathList[currentPathIndex] != undefined" matInput type="text"
+                                        (change)="onPathChange($event)" [(value)]="pathList[currentPathIndex]">
                         </div>
-                        <div class="col-3"></div>
+                        <div class="col-3">
+                                <button mat-flat-button (click)="Create(true)">
+                                        Create file
+                                </button>
+                                <button mat-flat-button (click)="Create(false)">
+                                        Create Folder
+                                </button>
+                        </div>
                         <div class="col-3 text-center">
                                 <shared-machine-selector-component (onChangeServer)="onChangeServer($event)">
                                 </shared-machine-selector-component>
@@ -22,12 +27,12 @@
                 </div>
         </mat-card>
         <p *ngIf="error.length != 0" class="mt-5 text-center">{{error}}</p>
-
         <div class="row m-0 p-0">
                 <div class="row">
                         <div class="col-6">
                                 <mat-list role="list">
                                         <mat-list-item role="listitem" class="m-2 cursor"
+                                                (contextmenu)="onRightClick($event, file)"
                                                 *ngFor="let file of filesFirst" (click)="onNodeClick(file)">
                                                 <mat-icon class="mt-3">
                                                         {{ file.isFile ? 'insert_drive_file' : 'folder'}}
@@ -42,6 +47,7 @@
                         <div class="col-6">
                                 <mat-list role="list">
                                         <mat-list-item role="listitem" class="m-2 cursor"
+                                                (contextmenu)="onRightClick($event, file)"
                                                 *ngFor="let file of filesSecond" (click)="onNodeClick(file)">
                                                 <mat-icon class="mt-3">
                                                         {{ file.isFile ? 'insert_drive_file' : 'folder'}}
@@ -49,10 +55,21 @@
                                                 <div class="pt-3 ml-3">
                                                         {{file.name}}
                                                 </div>
+
                                         </mat-list-item>
                                 </mat-list>
                         </div>
                 </div>
-
         </div>
+</div>
+<div #context class="context" (mouseleave)="onUnovering($event)">
+        <mat-card>
+                <button mat-flat-button (click)="OpenEditor()">Open in Editor</button>
+                <br>
+                <button mat-flat-button (click)="Delete()">Delete</button>
+                <br>
+                <button mat-flat-button (click)="Copy()">Copy</button>
+                <br>
+                <button mat-flat-button (click)="Paste()">Paste</button>
+        </mat-card>
 </div>

@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { CustomMaterialModule } from '../material-module';
-import { ReactiveFormsModule } from '@angular/forms';
 import { CommandClient } from 'src/api';
 import {  HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
@@ -14,7 +13,8 @@ import { ServersService } from './services/servers.service';
 import { ProcessesComponent } from './components/processes/processes.component';
 import { SharedMachineSelectorComponent } from './components/shared/machine-selector/shared-machine-selector.component';
 import { FilesComponent } from './components/files/files.component';
-
+import { SharedCreateFileModel } from './components/shared/create-file-modal/shared-create-file-modal';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -24,7 +24,9 @@ import { FilesComponent } from './components/files/files.component';
     SettingsComponent,
     ProcessesComponent,
     FilesComponent,
-    SharedMachineSelectorComponent
+    SharedMachineSelectorComponent,
+    SharedCreateFileModel,
+    
   ],
   imports: [
     ReactiveFormsModule,
@@ -32,6 +34,7 @@ import { FilesComponent } from './components/files/files.component';
     BrowserModule,
     CustomMaterialModule,
     HttpClientModule,
+    FormsModule,
     RouterModule.forRoot(
       [
         { path: '', component: ConsoleComponent},
@@ -43,6 +46,7 @@ import { FilesComponent } from './components/files/files.component';
       ]
     )
   ],
+  entryComponents: [SharedCreateFileModel],
   providers: [CommandClient, ServersService],
   bootstrap: [AppComponent]
 })
