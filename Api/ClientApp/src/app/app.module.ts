@@ -13,8 +13,10 @@ import { ServersService } from './services/servers.service';
 import { ProcessesComponent } from './components/processes/processes.component';
 import { SharedMachineSelectorComponent } from './components/shared/machine-selector/shared-machine-selector.component';
 import { FilesComponent } from './components/files/files.component';
-import { SharedCreateFileModel } from './components/shared/create-file-modal/shared-create-file-modal';
+import { SharedCreateFileModalComponent } from './components/shared/create-file-modal/shared-create-file-modal.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { EditorModalComponent } from './components/editor/editor-modal.component';
+import { SharedYesNoModalComponent } from './components/shared/yes-no-modal/shared-yes-no-modal.component';
 
 @NgModule({
   declarations: [
@@ -25,8 +27,9 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     ProcessesComponent,
     FilesComponent,
     SharedMachineSelectorComponent,
-    SharedCreateFileModel,
-    
+    SharedYesNoModalComponent,
+    SharedCreateFileModalComponent,
+    EditorModalComponent
   ],
   imports: [
     ReactiveFormsModule,
@@ -46,7 +49,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
       ]
     )
   ],
-  entryComponents: [SharedCreateFileModel],
+  entryComponents: [SharedCreateFileModalComponent, SharedYesNoModalComponent, EditorModalComponent],
   providers: [CommandClient, ServersService],
   bootstrap: [AppComponent]
 })

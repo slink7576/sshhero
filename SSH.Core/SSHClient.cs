@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SSH.Core
 {
@@ -41,20 +43,41 @@ namespace SSH.Core
         public ExecuteCustomCommandResponse Execute(string command, bool isSudo)
         {
             SshCommand comm = null;
-            if (isSudo)
+            var task = Task.Run(() =>
             {
-                comm = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S " + command);
+                if (isSudo)
+                {
+                    comm = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S " + command);
+                }
+                else
+                {
+                    comm = _client.RunCommand(command);
+                }
+                return new ExecuteCustomCommandResponse()
+                {
+                    IsError = comm.ExitStatus == 0 ? false : true,
+                    Error = comm.Error,
+                    Result = comm.Result
+                };
+            });
+            if (task.Wait(TimeSpan.FromSeconds(2)))
+            {
+                return new ExecuteCustomCommandResponse()
+                {
+                    IsError = comm.ExitStatus == 0 ? false : true,
+                    Error = comm.Error,
+                    Result = comm.Result
+                };
+                
             }
             else
             {
-                comm = _client.RunCommand(command);
-            }
-            return new ExecuteCustomCommandResponse()
-            {
-                IsError = comm.ExitStatus == 0 ? false : true,
-                Error = comm.Error,
-                Result = comm.Result
-            };
+                return new ExecuteCustomCommandResponse()
+                {
+                    IsError = true,
+                    Error = "Command timeout"
+                };
+            }        
         }
 
         public CheckConnectionCommandResponse CheckConnection()
@@ -218,9 +241,9 @@ namespace SSH.Core
             };
         }
 
-        public CopyObjectCommandResponse Copy(string from, string to)
+        public CopyObjectCommandResponse Copy(string from, string to, string file)
         {
-            var command = _client.RunCommand("cp " + from + " " + to);
+            var command = _client.RunCommand("cp " + '"' + from + "/" + file + '"' + " " + '"' + to + '"');
             return new CopyObjectCommandResponse()
             {
                 IsError = command.ExitStatus == 0 ? false : true,
@@ -229,13 +252,48 @@ namespace SSH.Core
             };
         }
 
-        public GetFileBodyCommandResponse GetFile(string file)
+        public GetFileBodyCommandResponse GetFile(string path)
         {
-            var command = _client.RunCommand("cat " + file);
-            return new GetFileBodyCommandResponse(){
+            var command = _client.RunCommand("cat " + "'" + path + "'");
+            if (command.Result.Length < 20000)
+            {
+                return new GetFileBodyCommandResponse()
+                {
+                    IsError = command.ExitStatus == 0 ? false : true,
+                    Error = command.Error,
+                    Data = command.Result
+                };
+            }
+            else
+            {
+                return new GetFileBodyCommandResponse()
+                {
+                    IsError = true,
+                    Error = "File is too big"
+                };
+            }
+           
+        }
+
+        public CutObjectCommandResponse Cut(string from, string to, string file)
+        {
+            var copyResponse = Copy(from, to, file);
+            var deleteResponse = Delete(from, file);
+            return new CutObjectCommandResponse()
+            {
+                IsError = copyResponse.IsError,
+                Error = copyResponse.Error,
+                Nodes = copyResponse.Nodes
+            };
+        }
+
+        public BaseCommandResponse WriteFile(string path, string data)
+        {
+            var command = _client.RunCommand("printf " + '"' + data + '"' + " > " + '"' + path + '"');
+            return new BaseCommandResponse()
+            {
                 IsError = command.ExitStatus == 0 ? false : true,
-                Error = command.Error,
-                Data = command.Result
+                Error = command.Error
             };
         }
     }

@@ -18,7 +18,9 @@ namespace SSH.Core.Interfaces
         GetFilesCommandResponse GetFiles(string path);
         DeleteObjectCommandResponse Delete(string path, string name);
         CreateObjectCommandResponse Create(string path, string name, bool isFile);
-        CopyObjectCommandResponse Copy(string from, string to);
-        GetFileBodyCommandResponse GetFile(string file);
+        CopyObjectCommandResponse Copy(string from, string to, string file);
+        CutObjectCommandResponse Cut(string from, string to, string file);
+        GetFileBodyCommandResponse GetFile(string path);
+        BaseCommandResponse WriteFile(string path, string data);
     }
 }

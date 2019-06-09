@@ -1,0 +1,17 @@
+<div class="col-12 text-center">
+    <h1>{{data.fileName}}</h1>
+    <textarea [(ngModel)]="data.fileBody" style="min-width: 100%; min-height: 50vh">
+
+    </textarea>
+    <div class="row m-0 mt-4 p-0">
+        <div class="col-6">
+                <button mat-button mat-dialog-close>Cancel</button>
+        </div>
+        <div class="col-6">
+                <button mat-flat-button color="primary" (click)="Save()">Save</button>
+        </div>
+            
+            
+    </div>
+  
+</div>

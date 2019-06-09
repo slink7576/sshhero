@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SSH.Core.Commands
 {
-    public abstract class BaseCommandResponse
+    public class BaseCommandResponse
     {
         public bool IsError { get; set; }
         public string Error { get; set; }

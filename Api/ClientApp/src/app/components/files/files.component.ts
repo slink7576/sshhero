@@ -1,9 +1,12 @@
 import { Component, OnInit, AfterViewChecked, ViewChild } from "@angular/core";
-import { CommandClient, FileNode, Credentials, GetFilesCommand, CreateObjectCommand, DeleteObjectCommand } from "src/api";
+import { CommandClient, FileNode, Credentials, GetFilesCommand, CreateObjectCommand, DeleteObjectCommand, GetFileBodyCommand, CutObjectCommand, CopyObjectCommand } from "src/api";
 import { ServersService } from "src/app/services/servers.service";
 import { NavigationEnd } from "@angular/router";
-import { MatMenuTrigger, MatDialog } from "@angular/material";
-import { SharedCreateFileModel } from "../shared/create-file-modal/shared-create-file-modal";
+import { MatMenuTrigger, MatDialog, MatSnackBar } from "@angular/material";
+import { SharedCreateFileModalComponent } from "../shared/create-file-modal/shared-create-file-modal.component";
+import { SharedYesNoModalComponent } from "../shared/yes-no-modal/shared-yes-no-modal.component";
+import { EditorModalComponent } from "../editor/editor-modal.component";
+import { EditFileModalData } from "src/entities/EditFileModalData";
 
 @Component({
    selector: 'files-component',
@@ -18,19 +21,28 @@ export class FilesComponent {
    pathList = new Array<string>();
    currentPathIndex = 0;
    error = '';
-   currentItem = new FileNode();
+   currentItem = null;
+   fileNameBuffer = '';
+   filePathBuffer = '';
+   isCut = false;
    @ViewChild('context') contextMenu;
    constructor(private serversService: ServersService,
+      private snackBar: MatSnackBar,
       private client: CommandClient, public dialog: MatDialog) { }
 
-   onRightClick(event, item) {
+   onOpenMenu(event){
       event.preventDefault();
-      this.currentItem = item;
       this.contextMenu.nativeElement.setAttribute("style", "position:absolute;visibility:visible;"
-         + "top:" + event.clientY + "px;left:" + (event.clientX - 20) + "px");
+      + "top:" + (event.clientY + 40)  + "px;left:" + (event.clientX - 40) + "px");
+   }
+
+
+   onRightClick(item) {
+      this.currentItem = item;
    }
 
    onUnovering(event) {
+      this.currentItem = null;
       this.contextMenu.nativeElement.setAttribute("style", "position:absolute;visibility:hidden;");
    }
 
@@ -102,12 +114,12 @@ export class FilesComponent {
    }
 
    Create(isFile) {
-      const dialogRef = this.dialog.open(SharedCreateFileModel, {
+      const dialogRef = this.dialog.open(SharedCreateFileModalComponent, {
          width: '70vh',
          data: { name: '', isFile: isFile }
       });
       dialogRef.afterClosed().subscribe(result => {
-         if (result.name) {
+         if (result) {
             let command = new CreateObjectCommand();
             command.credentials = new Credentials(this.currentServer);
             command.isFile = isFile;
@@ -121,25 +133,86 @@ export class FilesComponent {
    }
 
    Delete() {
-      let command = new DeleteObjectCommand();
-      command.credentials = new Credentials(this.currentServer);
-      command.path = this.pathList[this.currentPathIndex];
-      command.name = this.currentItem.name;
-      this.client.delete(command).subscribe(data => {
-         this.UpdateData(data);
+      let name = this.currentItem.name;
+      const dialogRef = this.dialog.open(SharedYesNoModalComponent, {
+         width: '70vh'
+      });
+      dialogRef.afterClosed().subscribe(result => {
+         if(result){
+            let command = new DeleteObjectCommand();
+            command.credentials = new Credentials(this.currentServer);
+            command.path = this.pathList[this.currentPathIndex];
+            command.name = name;
+            this.client.delete(command).subscribe(data => {
+               this.UpdateData(data);
+            });
+         }
       });
    }
 
    OpenEditor() {
+      let name = this.currentItem.name;
+      let command = new GetFileBodyCommand();
+      command.credentials = new Credentials(this.currentServer);
+      command.path = this.pathList[this.currentPathIndex] + '/' + this.currentItem.name;
+      this.client.getFileBody(command).subscribe(data => {
+         if(!data.isError){
+            let modalData = new EditFileModalData()
+            modalData.fileName = name;
+            modalData.filePath = this.pathList[this.currentPathIndex];
+            modalData.fileBody = data.data;
+            modalData.server = this.currentServer;
+            const dialogRef = this.dialog.open(EditorModalComponent, {
+               width: '100vh',
+               data: modalData
+            });
+            dialogRef.afterClosed().subscribe(result => {
+   
+            })
+         }
+        else{
+            this.snackBar.open(data.error, '', {
+               duration: 2000,
+            });
+        }
+      })
+   }
 
+   Cut() {
+      this.fileNameBuffer = this.currentItem.name;
+      this.filePathBuffer = this.pathList[this.currentPathIndex];
+      this.isCut = true;
    }
 
    Copy() {
-
+      this.fileNameBuffer = this.currentItem.name;
+      this.filePathBuffer = this.pathList[this.currentPathIndex];
+      this.isCut = false;
    }
 
    Paste() {
-
+      if(this.fileNameBuffer.length > 1){
+         if(this.isCut){
+            let command = new CutObjectCommand();
+            command.credentials = new Credentials(this.currentServer);
+            command.file = this.fileNameBuffer;
+            command.from = this.filePathBuffer;
+            command.to = this.pathList[this.currentPathIndex];
+            this.client.cut(command).subscribe(data => {
+               this.UpdateData(data);
+            });
+         }else{
+            let command = new CopyObjectCommand();
+            command.credentials = new Credentials(this.currentServer);
+            command.file = this.fileNameBuffer;
+            command.from = this.filePathBuffer;
+            command.to = this.pathList[this.currentPathIndex];
+            this.client.copy(command).subscribe(data => {
+               this.UpdateData(data);
+            });
+         }
+      }
+      this.fileNameBuffer = '';
    }
 
    onChangeServer(event: Credentials) {

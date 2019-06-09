@@ -5,3 +5,6 @@
     position: absolute;
     visibility: hidden;
 }
+.files-content{
+    min-height: 50vh;
+}

@@ -492,6 +492,214 @@ export class CommandClient {
         }
         return _observableOf<DeleteObjectViewModel | null>(<any>null);
     }
+
+    copy(command: CopyObjectCommand): Observable<CopyObjectViewModel | null> {
+        let url_ = this.baseUrl + "/api/Command/Copy";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCopy(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCopy(<any>response_);
+                } catch (e) {
+                    return <Observable<CopyObjectViewModel | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<CopyObjectViewModel | null>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCopy(response: HttpResponseBase): Observable<CopyObjectViewModel | null> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? CopyObjectViewModel.fromJS(resultData200) : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CopyObjectViewModel | null>(<any>null);
+    }
+
+    cut(command: CutObjectCommand): Observable<CutObjectViewModel | null> {
+        let url_ = this.baseUrl + "/api/Command/Cut";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCut(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCut(<any>response_);
+                } catch (e) {
+                    return <Observable<CutObjectViewModel | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<CutObjectViewModel | null>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processCut(response: HttpResponseBase): Observable<CutObjectViewModel | null> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? CutObjectViewModel.fromJS(resultData200) : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<CutObjectViewModel | null>(<any>null);
+    }
+
+    getFileBody(command: GetFileBodyCommand): Observable<GetFileBodyViewModel | null> {
+        let url_ = this.baseUrl + "/api/Command/GetFileBody";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetFileBody(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetFileBody(<any>response_);
+                } catch (e) {
+                    return <Observable<GetFileBodyViewModel | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<GetFileBodyViewModel | null>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetFileBody(response: HttpResponseBase): Observable<GetFileBodyViewModel | null> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? GetFileBodyViewModel.fromJS(resultData200) : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<GetFileBodyViewModel | null>(<any>null);
+    }
+
+    writeFile(command: WriteFileCommand): Observable<WriteFileViewModel | null> {
+        let url_ = this.baseUrl + "/api/Command/WriteFile";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(command);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processWriteFile(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processWriteFile(<any>response_);
+                } catch (e) {
+                    return <Observable<WriteFileViewModel | null>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<WriteFileViewModel | null>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processWriteFile(response: HttpResponseBase): Observable<WriteFileViewModel | null> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = resultData200 ? WriteFileViewModel.fromJS(resultData200) : <any>null;
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<WriteFileViewModel | null>(<any>null);
+    }
 }
 
 export abstract class BaseViewModel implements IBaseViewModel {
@@ -1306,6 +1514,300 @@ export class DeleteObjectCommand extends BaseCommand implements IDeleteObjectCom
 export interface IDeleteObjectCommand extends IBaseCommand {
     path?: string | undefined;
     name?: string | undefined;
+}
+
+export class CopyObjectViewModel extends BaseViewModel implements ICopyObjectViewModel {
+    nodes?: FileNode[] | undefined;
+
+    constructor(data?: ICopyObjectViewModel) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            if (data["nodes"] && data["nodes"].constructor === Array) {
+                this.nodes = [] as any;
+                for (let item of data["nodes"])
+                    this.nodes!.push(FileNode.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CopyObjectViewModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new CopyObjectViewModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.nodes && this.nodes.constructor === Array) {
+            data["nodes"] = [];
+            for (let item of this.nodes)
+                data["nodes"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface ICopyObjectViewModel extends IBaseViewModel {
+    nodes?: FileNode[] | undefined;
+}
+
+export class CopyObjectCommand extends BaseCommand implements ICopyObjectCommand {
+    from?: string | undefined;
+    to?: string | undefined;
+    file?: string | undefined;
+
+    constructor(data?: ICopyObjectCommand) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            this.from = data["from"];
+            this.to = data["to"];
+            this.file = data["file"];
+        }
+    }
+
+    static fromJS(data: any): CopyObjectCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CopyObjectCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["from"] = this.from;
+        data["to"] = this.to;
+        data["file"] = this.file;
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface ICopyObjectCommand extends IBaseCommand {
+    from?: string | undefined;
+    to?: string | undefined;
+    file?: string | undefined;
+}
+
+export class CutObjectViewModel extends BaseViewModel implements ICutObjectViewModel {
+    nodes?: FileNode[] | undefined;
+
+    constructor(data?: ICutObjectViewModel) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            if (data["nodes"] && data["nodes"].constructor === Array) {
+                this.nodes = [] as any;
+                for (let item of data["nodes"])
+                    this.nodes!.push(FileNode.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CutObjectViewModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new CutObjectViewModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.nodes && this.nodes.constructor === Array) {
+            data["nodes"] = [];
+            for (let item of this.nodes)
+                data["nodes"].push(item.toJSON());
+        }
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface ICutObjectViewModel extends IBaseViewModel {
+    nodes?: FileNode[] | undefined;
+}
+
+export class CutObjectCommand extends BaseCommand implements ICutObjectCommand {
+    from?: string | undefined;
+    to?: string | undefined;
+    file?: string | undefined;
+
+    constructor(data?: ICutObjectCommand) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            this.from = data["from"];
+            this.to = data["to"];
+            this.file = data["file"];
+        }
+    }
+
+    static fromJS(data: any): CutObjectCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CutObjectCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["from"] = this.from;
+        data["to"] = this.to;
+        data["file"] = this.file;
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface ICutObjectCommand extends IBaseCommand {
+    from?: string | undefined;
+    to?: string | undefined;
+    file?: string | undefined;
+}
+
+export class GetFileBodyViewModel extends BaseViewModel implements IGetFileBodyViewModel {
+    data?: string | undefined;
+
+    constructor(data?: IGetFileBodyViewModel) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            this.data = data["data"];
+        }
+    }
+
+    static fromJS(data: any): GetFileBodyViewModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetFileBodyViewModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["data"] = this.data;
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IGetFileBodyViewModel extends IBaseViewModel {
+    data?: string | undefined;
+}
+
+export class GetFileBodyCommand extends BaseCommand implements IGetFileBodyCommand {
+    path?: string | undefined;
+
+    constructor(data?: IGetFileBodyCommand) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            this.path = data["path"];
+        }
+    }
+
+    static fromJS(data: any): GetFileBodyCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetFileBodyCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["path"] = this.path;
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IGetFileBodyCommand extends IBaseCommand {
+    path?: string | undefined;
+}
+
+export class WriteFileViewModel extends BaseViewModel implements IWriteFileViewModel {
+
+    constructor(data?: IWriteFileViewModel) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+    }
+
+    static fromJS(data: any): WriteFileViewModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new WriteFileViewModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IWriteFileViewModel extends IBaseViewModel {
+}
+
+export class WriteFileCommand extends BaseCommand implements IWriteFileCommand {
+    path?: string | undefined;
+    data?: string | undefined;
+
+    constructor(data?: IWriteFileCommand) {
+        super(data);
+    }
+
+    init(data?: any) {
+        super.init(data);
+        if (data) {
+            this.path = data["path"];
+            this.data = data["data"];
+        }
+    }
+
+    static fromJS(data: any): WriteFileCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new WriteFileCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["path"] = this.path;
+        data["data"] = this.data;
+        super.toJSON(data);
+        return data; 
+    }
+}
+
+export interface IWriteFileCommand extends IBaseCommand {
+    path?: string | undefined;
+    data?: string | undefined;
 }
 
 export class SwaggerException extends Error {

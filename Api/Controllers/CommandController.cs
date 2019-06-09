@@ -4,12 +4,16 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using SSH.Application.Command.Commands.CopyObject;
 using SSH.Application.Command.Commands.CreateObject;
+using SSH.Application.Command.Commands.CutObject;
 using SSH.Application.Command.Commands.DeleteObject;
 using SSH.Application.Command.Commands.ExecuteCustom;
+using SSH.Application.Command.Commands.GetFileBody;
 using SSH.Application.Command.Commands.GetFiles;
 using SSH.Application.Command.Commands.KillProcess;
 using SSH.Application.Command.Commands.Reboot;
+using SSH.Application.Command.Commands.WriteFile;
 using SSH.Application.Connection.Command.CheckConnection;
 using SSH.Application.Processes.Query.GetAllProcesses;
 using SSH.Application.System.Commands.GetSystemInfo;
@@ -71,6 +75,30 @@ namespace Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(DeleteObjectViewModel), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Delete([FromBody] DeleteObjectCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(CopyObjectViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Copy([FromBody] CopyObjectCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(CutObjectViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> Cut([FromBody] CutObjectCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(GetFileBodyViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GetFileBody([FromBody] GetFileBodyCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(WriteFileViewModel), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> WriteFile([FromBody] WriteFileCommand command)
         {
             return Ok(await Mediator.Send(command));
         }
