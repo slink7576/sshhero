@@ -1,8 +1,11 @@
 
 @font-face{
     font-family: "Terminal";
-    src: url("./../fonts/Futura.ttf");
+    src: url("./../fonts/Dejavu.ttf");
   }
+.terminal-font{
+    font-family: "Terminal"
+}
 .holder{
     position: absolute;
     top: 0;

@@ -4,7 +4,7 @@
         </p>
         <form *ngIf="this.servers.length != 0" [formGroup]="serversFormGroup"
                 autocomplete="off">
-                <mat-form-field style="min-width:50%" >
+                <mat-form-field style="min-width:100%" >
                         <mat-label>Current machine</mat-label>
                         <mat-select (selectionChange)="onChangedServer()" formControlName="Server" >
                                 <mat-option *ngFor="let server of servers" [value]="server">

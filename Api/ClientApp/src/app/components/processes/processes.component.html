@@ -1,14 +1,15 @@
-<div class="row m-0 p-5">
-    <div class="col-xl-6 col-12">
-            <h1>Processes list</h1>
-    </div>
-    <div class="col-xl-6 col-12 text-center">
-            <shared-machine-selector-component (onChangeServer)="onChangeServer($event)">
-
-                </shared-machine-selector-component>
-    </div>
-</div>
-    <div class="col-xl-12 col-12 pl-5 pb-5">
+<div class="row pt-3 m-0" style="background-color: white">
+  <div class="col-6 pl-5 pt-2">
+          <h5>Processes</h5>
+  </div>
+         <div class="col-6">
+                  <shared-machine-selector-component (onChangeServer)="onChangeServer($event)">
+                          
+                          </shared-machine-selector-component>
+                
+         </div>
+ </div>
+    <div class="col-xl-12 col-12 pl-5 pb-5" style="background-color: whitesmoke">
 
 <p class="text-danger">{{error}}</p>
 

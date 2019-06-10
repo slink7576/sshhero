@@ -2,12 +2,17 @@
 background-color: whitesmoke;
 width: 100%;
 color:black;
-padding: 1em;
-font-size: 200%;
+
+font-size: 100%;
+
 }
+
 .servers{
     position: absolute;
     font-size: 50%;
     right: 3%;
     top: 3%;
+}
+.console-input{
+   
 }

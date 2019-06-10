@@ -1,20 +1,28 @@
+<div class="text-center">
 <div class="mb-4">
-    <button mat-flat-button color="primary" routerLink="/console" class="side-button">
-        <mat-icon>input</mat-icon>
+    <button mat-flat-button color="primary" routerLink="/console" class="side-button mr-4">
+        <mat-icon>dns</mat-icon>
     </button>
-</div>
-<div class="mb-4">
     <button mat-flat-button color="primary" routerLink="/processes" class="side-button">
-        <mat-icon>apps</mat-icon>
+        <mat-icon>widgets</mat-icon>
     </button>
 </div>
-<div class="mb-4">
-    <button mat-flat-button color="primary" routerLink="/files" class="side-button">
+<div class="mb-5">
+    <button mat-flat-button color="primary" routerLink="/files" class="side-button mr-4">
         <mat-icon>folder</mat-icon>
     </button>
-</div>
-<div>
     <button mat-flat-button color="primary" routerLink="/settings" class="side-button">
         <mat-icon>settings</mat-icon>
     </button>
+</div>
+
+<div style="position: absolute; bottom:5%; left:0%; width: 100%">
+<p>You logged as Slink7576</p>
+<button mat-flat-button color="primary" routerLink="/account" class="side-button mr-4">
+    <mat-icon>person</mat-icon>
+</button>
+    <button mat-flat-button color="warn" routerLink="/logout" class="side-button">
+        <mat-icon>exit_to_app</mat-icon>
+    </button>
+</div>
 </div>
