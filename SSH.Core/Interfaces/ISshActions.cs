@@ -12,8 +12,8 @@ namespace SSH.Core.Interfaces
         GetProcessesCommandResponse GetProcesses();
         GetSystemInfoCommandResponse GetInfo();
         CheckConnectionCommandResponse CheckConnection();
-        RebootCommandResponse Reboot();
-        KillProcessCommandResponse KillProcess(int id);
+        BaseCommandResponse Reboot();
+        BaseCommandResponse KillProcess(int id);
         ExecuteCustomCommandResponse Execute(string command, bool isSudo);
         GetFilesCommandResponse GetFiles(string path);
         DeleteObjectCommandResponse Delete(string path, string name);

@@ -134,20 +134,20 @@ namespace SSH.Core
             };
         }
 
-        public RebootCommandResponse Reboot()
+        public BaseCommandResponse Reboot()
         {
             var command = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S shutdown -r");
-            return new RebootCommandResponse()
+            return new BaseCommandResponse()
             {
                 IsError = command.ExitStatus == 0 ? false : true,
                 Error = command.Error
             };
         }
 
-        public KillProcessCommandResponse KillProcess(int id)
+        public BaseCommandResponse KillProcess(int id)
         {
             var command = _client.RunCommand("echo -e '" + _credentials.Password + "' | sudo -S kill " + id);
-            return new KillProcessCommandResponse()
+            return new BaseCommandResponse()
             {
                 IsError = command.ExitStatus == 0 ? false : true,
                 Error = command.Error
